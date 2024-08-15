@@ -1,19 +1,11 @@
-# Starlight Starter Kit: Basics
+# ClassPad Docs
 
 [![Built with Starlight](https://astro.badg.es/v2/built-with-starlight/tiny.svg)](https://starlight.astro.build)
 
-```
-npm create astro@latest -- --template starlight
-```
-
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/starlight/tree/main/examples/basics)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/starlight/tree/main/examples/basics)
-
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
 
 ## 🚀 Project Structure
 
-Inside of your Astro + Starlight project, you'll see the following folders and files:
+Inside you'll see the following folders and files:
 
 ```
 .
@@ -34,6 +26,15 @@ Starlight looks for `.md` or `.mdx` files in the `src/content/docs/` directory. 
 Images can be added to `src/assets/` and embedded in Markdown with a relative link.
 
 Static assets, like favicons, can be placed in the `public/` directory.
+
+### Documentation structure
+
+The structure of the doc is defined in `astro.config.mjs`, on the `starlight({ ... })` json object. Be sure to double-check any change made in here !
+
+### Custom data
+
+This doc uses some custom CSS in `src/custom.css`. Please don't use it too much as it affects every pages.
+
 
 ## 🧞 Commands
 

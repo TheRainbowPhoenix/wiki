@@ -80,7 +80,10 @@ export default defineConfig({
 			favicon: './src/assets/favicon.svg',
 			customCss: [
 				'./src/custom.css'
-			]
+			],
+			components: {
+				PageSidebar: './src/components/starlight/PageSidebar.astro',
+			}
 		}),
 	],
 });
