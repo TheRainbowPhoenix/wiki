@@ -67,13 +67,13 @@ The CPU73050 is used by the fx-CG50 PRIZM, that's neighbor of the ClassPad CP400
 
 | Format | Abstract | Code |
 |---|---|---|
-| `bsr disp` | Branch to subroutine; PR <- return address. | `1011iiiidddddddd` |
+| `bsr disp` | Branch to subroutine; PR ← return address. | `1011iiiidddddddd` |
 
 ### bsrf
 
 | Format | Abstract | Code |
 |---|---|---|
-| `bsrf Rn` | Branch to subroutine via register offset; PR <- return address. | `0000nnnn00000011` |
+| `bsrf Rn` | Branch to subroutine via register offset; PR ← return address. | `0000nnnn00000011` |
 
 ### bt
 
@@ -244,7 +244,7 @@ The CPU73050 is used by the fx-CG50 PRIZM, that's neighbor of the ClassPad CP400
 
 | Format | Abstract | Code |
 |---|---|---|
-| `jsr @Rn` | Jump to subroutine register target; PR <- return address. | `0100nnnn00001011` |
+| `jsr @Rn` | Jump to subroutine register target; PR ← return address. | `0100nnnn00001011` |
 
 ### ldc
 
@@ -553,7 +553,7 @@ The CPU73050 is used by the fx-CG50 PRIZM, that's neighbor of the ClassPad CP400
 
 | Format | Abstract | Code |
 |---|---|---|
-| `rts` | Return from subroutine; PC <- PR. | `0000000000001011` |
+| `rts` | Return from subroutine; PC ← PR. | `0000000000001011` |
 
 ### setdmx
 
