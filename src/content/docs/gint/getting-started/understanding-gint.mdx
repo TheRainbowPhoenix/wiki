@@ -1,0 +1,228 @@
+---
+title: Understanding how gint works
+description: What the fx-CP400 hardware and the gint kernel do when your program runs
+sidebar:
+  order: 3
+---
+
+This page is a technical tour of the machine and the kernel. You do not need it to write a first program, but it explains what actually happens between `fxsdk build-cp` and your `main()`, and what the hardware can and cannot do for you while your code runs. Everything here is based on the ClassPad port of gint (target fxCP, version 2.11.0); where the port differs from the fx-9860G and fx-CG 50 versions, the ClassPad behavior is the one described.
+
+## The machine
+
+The ClassPad II (fx-CP400) is built around a Renesas [SH7305](/wiki/hardware/cpu/73050/), a SuperH SH4A core running at about 118 MHz. Three properties of this chip shape everything you do in a gint program.
+
+First, there is no usable [FPU](https://en.wikipedia.org/wiki/Floating-point_unit). The toolchain targets the no-FPU variant of the SH4A and gint does not enable the coprocessor, so every `float` and `double` operation is a call into software floating-point code from OpenLibm. Fixed-point arithmetic with plain integers is almost always faster.
+
+Second, there is no [MMU](https://en.wikipedia.org/wiki/Memory_management_unit) in play. Hardware detection in the port records that there is no userspace and no MMU in use, and `gint[HWURAM]` is 0. The 16 MiB of RAM form one flat address space. Pointers are physical addresses. There is no memory protection, so a stray pointer does not fault, it corrupts whatever it touches, including the kernel and the launcher. Most of RAM is visible around `0x8c000000`, which is the cached view of memory.
+
+Third, memory is not uniform. The CPU has a small cache over main RAM, and there are on-chip memory areas that sit outside the cache path and are faster than main RAM:
+
+| Region | Address | Size | Use |
+| --- | --- | --- | --- |
+| Main RAM | 0x8c000000 | 16 MiB | Everything: code, data, heap, VRAM |
+| On-chip X/Y memory | 0xe500e000 | 16 KiB | Fast storage, `xyram` section |
+| On-chip IL memory | 0xe5200000 | 4 KiB | Fast storage, `ilram` section |
+
+Main RAM itself varies: access through the cache is fast, uncached access (addresses seen at `0xa0000000` instead of `0x8c000000`) is slow. The LCD hangs on a 16-bit external bus.
+
+The screen is a Renesas R61523 in a 320x528 portrait layout, 16 bits per pixel in RGB565. The panel is not memory-mapped. You push pixels to it through a register window at `0xb4000000`, one write per pixel, with a GPIO bit selecting command or data. See the driver in [r61523.c](https://github.com/ClasspadDev/gint/blob/dev/src/r61523/r61523.c).
+
+Because there is no MMU and no protection, the usual discipline matters more than on a desktop. Peripheral registers must be accessed through `volatile` pointers. Writes to external-bus devices need `synco()` barriers so the store actually reaches the wire before the next one. And any wild write is a real crash, not an exception with a nice stack trace.
+
+One last piece of the machine: the CPU can stop. `sleep()` from `<gint/cpu.h>` executes the SuperH sleep instruction and halts the core until the next interrupt. gint uses it internally in `waitevent()` and you should use it in idle loops too. It saves battery and it is free.
+
+For a sense of what this chip can do in good hands, here is a talk about how Doom was made to run on a calculator, and what it took to get there.
+
+<iframe width="880" height="495" src="https://www.youtube.com/embed/LimTt0nn0IU" title="How Doom Pushed a Calculator Beyond Its Limits" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe>
+
+## From source to .hh3
+
+`fxsdk build-cp` is a wrapper. It sets the platform to fxCP, points CMake at the cross-compilation toolchain file, and runs the build. Your project's `CMakeLists.txt` does the rest:
+
+```cmake
+include(GenerateHH3)
+find_package(Gint 2.9 REQUIRED)
+find_package(JustUI 1.0 REQUIRED)
+
+target_link_libraries(myaddin Gint::Gint JustUI::JustUI)
+
+if("${FXSDK_PLATFORM_LONG}" STREQUAL fxCP)
+  generate_hh3(TARGET myaddin OUTPUT "MyAddin.hh3")
+endif()
+```
+
+CMake compiles your sources with `sh-elf-gcc`, a big-endian SuperH compiler with no FPU. Assets listed with `fxconv_declare_assets()` are converted to C data at build time. The link step uses the gint-provided script [fxcp_hh3.ld.c](https://github.com/ClasspadDev/gint/blob/dev/fxcp_hh3.ld.c), which places every section at fixed addresses in RAM. The result is a static ELF: no dynamic linking, no relocation at load time, everything resolved at link time.
+
+`generate_hh3` strips the ELF and the stripped file is your `.hh3`. The ELF also carries metadata notes built by the `HHK_NAME`, `HHK_DESCRIPTION`, `HHK_AUTHOR` and `HHK_VERSION` macros from `<gint/config.h>`. These land in a `.note.hollyhock` section and are what the launcher reads to show your app's name and description.
+
+### The toolchain
+
+The pieces are built from source and installed into the compiler's search path. In dependency order:
+
+1. `sh-elf-binutils`: assembler, linker, binutils for SuperH.
+2. `sh-elf-gcc`: the compiler. Needs binutils at build time, needs them again at install time.
+3. `fxlibc`: the C standard library, compiled with the new compiler.
+4. `gint` and `JustUI`: the kernel and the UI toolkit, which link against fxlibc and OpenLibm.
+
+`fxsdk` itself is a Python program that glues it all together, and `sh-elf-gdb` is a separate, optional debugger. All of these ship with `giteapc.make` files, so GiteaPC can build and install them in the right order with one command per repository. The gint-docker image does exactly this; if you would rather not build the toolchain, use `ghcr.io/therainbowphoenix/gint-docker` as a devcontainer and skip the whole section.
+
+If you install manually, use the dev branch of each repository. Lephe's originals live on the Planete Casio forge, and Phoebe keeps mirrors of the toolchain repos (fxsdk, sh-elf-binutils, sh-elf-gcc, fxlibc and friends) on git.xania.fr. The default branches are often outdated relative to dev, and the ClassPad port in particular needs recent gint.
+
+## Memory layout of a running app
+
+The linker script is the contract. It defines four RAM regions:
+
+| Region | Address | Size | Content |
+| --- | --- | --- | --- |
+| `ram` | 0x8c052800 | 337920 bytes | Your whole program |
+| `eram` | 0x8cff0000 | 61184 bytes | Extra sections (`.hh3*`, `.eram*`) |
+| `vbr` | 0x8cffef00 | 4352 bytes | VBR and interrupt handler tables |
+| on-chip | 0xe500e000, 0xe5200000 | 20 KiB | Fast scratch (`xyram`, `ilram` sections) |
+
+The main region deserves attention. 337920 bytes is exactly 320x528x2, the size of a full framebuffer. It is the Casio OS's VRAM backup area, memory that the OS keeps free because it uses it to save the screen. Hollyhock-3 itself is loaded at 0x8cfd0000, 128 KiB below the end of RAM, which is why the extra regions are squeezed in above it. Your code, your data, your BSS and everything else must fit in that one area. A single static array of `uint16_t[320*528]` would consume it entirely.
+
+Inside the region, the script lays out, in order: the Hollyhock notes, `.text` (starting with the entry point, then constructors and destructors, then the exception and TLB handler stubs, then all code), the interrupt handler blocks, the driver table, `.rodata`, `.data`, `.bss`, and finally `.gint.bss` where gint puts its own large uninitialized buffers. Everything above the end of `.gint.bss` is yours but unused; since the region is a fixed-size window, unused space cannot be given back to anyone.
+
+The eram region exists because some things cannot live in the main region. It holds sections named `.hh3*` and `.eram*`, which you only use deliberately. The on-chip regions are more interesting: sections named `.ilram` and `.xyram` are loaded into ILRAM and XYRAM by the launcher like any other segment, so you can place hot code or data there with a section attribute and get memory that is faster than main RAM. 20 KiB total is not much, so the usual use is a small function or a set of counters rather than buffers.
+
+One special address sits below your program. The Casio OS keeps its own framebuffer at 0x8c000000, and gint uses that exact buffer as its VRAM, as you can see in [dvram.c](https://github.com/ClasspadDev/gint/blob/dev/src/render-cg/dvram.c). At boot, gint compresses the current screen content and keeps the compressed copy on the heap, so it can restore the previous display when the program exits. You never see this; just be aware that the 330 KiB below your program is not free either.
+
+The stack is inherited from the launcher: YAL calls your entry point on its own stack and the kernel keeps it. Keep stack frames reasonable; there is no separate kernel stack for your program.
+
+## Boot
+
+Starting a gint app goes through three layers. The launcher, then the Hollyhock entry shim, then the kernel.
+
+YAL scans storage memory for `.hh3` files, shows the list, and when you pick one it loads the ELF. The loader in YAL reads the program headers, copies each `PT_LOAD` segment's file contents to its virtual address, zeroes the remainder up to `p_memsz` (this is how your BSS is wiped), then flushes the cache over every loaded byte so the CPU does not execute stale cache lines. It validates that the file is a static SuperH executable, builds `argv` with the file path, and calls the entry point with `argc`, `argv` and `environ`.
+
+YAL also puts two variables in the environment: `HHK_SYMBOL_TABLE` and `HHK_SYMBOL_TABLE_LEN`, as hex strings. The table is a list of name and address pairs for Casio OS functions that Hollyhock-3 exposes. The first entry is a version string which is checked against the OS version in ROM, to catch symbol tables built for a different OS.
+
+Your entry point is `_hhk3_entry`, defined in [hhk3_start.c](https://github.com/ClasspadDev/gint/blob/dev/src/kernel/hhk3_start.c). It walks the symbol table and copies the address of each known symbol into a global variable. The list is short and practical: `Mem_Malloc` and `Mem_Free` for the OS heap, and the `File_*` family for filesystem access. It also installs a custom `realloc` built on those two. If the environment variables or the table are missing, it panics with a specific code (0x2020 and friends), which is what you see if you run a gint app outside Hollyhock-3. Then it calls `start()`.
+
+`start()` in [start.c](https://github.com/ClasspadDev/gint/blob/dev/src/kernel/start.c) is the C runtime. On the ClassPad it is short because the loader already copied `.data` and zeroed `.bss`. It detects the hardware, then calls `kinit()` in [kernel.c](https://github.com/ClasspadDev/gint/blob/dev/src/kernel/kernel.c), which does the real installation:
+
+1. Initialize kmalloc and its arenas.
+2. Allocate the two world buffers (driver state snapshots for the OS world and the gint world) and the driver flags.
+3. Initialize the VRAM, which includes backing up the current screen.
+4. Call every driver constructor, in priority order.
+5. Copy the exception, TLB and interrupt handler entry points into the VBR region and switch the VBR over.
+
+From this point interrupts go to gint, not to Casio's handlers. Control then passes to your constructors, and `main()` runs. The call is wrapped in `setjmp(gint_exitbuf)`: when your program calls `exit()` or returns from `main()`, control longjmps back, destructors run, and `kquit()` restores the drivers and the VBR to their saved state before returning the exit code to YAL.
+
+If something goes wrong during this process or later, the CPU raises an exception and gint's exception handler in [exch.c](https://github.com/ClasspadDev/gint/blob/dev/src/kernel/exch.c) catches it. The default handler draws a panic screen in the style of the Casio System ERROR, with the exception code, the faulting PC and the fault address, and stops there. `gint_panic()` triggers the same screen with a custom code, which is how the entry shim reports a missing symbol table. You can install your own handler with `gint_panic_set()` if you would rather die differently.
+
+There is no return to the Casio OS. On fx-9860G and fx-CG 50, gint can pop the calculator's main menu and come back. On the ClassPad that machinery does not exist: `gint_setrestart()` is a no-op and `gint_osmenu()` has no effect. When your `main()` returns, the program is over and the launcher gets control back.
+
+:::caution
+There is no way back. Once `main()` returns, the gint application is finished and there is no Casio menu to resume it from. Structure your program around one main loop that runs as long as the user wants it to, not around exiting and restarting.
+:::
+
+To summarize the whole path from the launcher to your code:
+
+1. YAL lists the `.hh3` files, you pick one, the ELF is validated and its segments are copied to their fixed addresses, cache flushed.
+2. YAL exports the OS symbol table in the environment and calls the entry point.
+3. `hhk3_entry()` resolves `Mem_Malloc`, `Mem_Free` and the `File_*` functions from the table.
+4. `start()` detects the hardware and `kinit()` installs kmalloc, the worlds, the drivers and the VBR.
+5. Constructors run, then `main()`.
+
+## Drivers and world switching
+
+A gint driver is a piece of code that owns one hardware module. Each driver declares a state buffer, a priority, and a set of lifecycle functions: power on and off, save and restore state, configure, and bind and unbind. The table in [drivers.h](https://github.com/ClasspadDev/gint/blob/dev/include/gint/drivers.h) explains the vocabulary: a device is powered if its clock is on, bound if a driver has exclusive access, and configured if it is set up for use.
+
+The priorities fix the startup order, and the same order is reused for state snapshots:
+
+| Priority | Driver | Manages |
+| --- | --- | --- |
+| 0 | cpu | CPU registers, atomic sections |
+| 1 | intc | Interrupt controller |
+| 2 | mmu | TLB (mostly inert here) |
+| 5 | cpg, dma | Clocks, DMA controller |
+| 13 | rtc, tmu | Real-time clock, timers |
+| 16 | usb | USB controller |
+| 22 | touch | Touchscreen |
+| 23 | keysc | Keyboard |
+| 26 | r61523 | LCD |
+
+The interesting concept is the world. A world is a snapshot of every driver's state. gint keeps two of them: one for the Casio OS environment as it was at boot, one for itself. `gint_world_switch()` in [world.c](https://github.com/ClasspadDev/gint/blob/dev/src/kernel/world.c) saves the gint world, restores the OS world, runs the function you pass (build one with `GINT_CALL()`), then switches back. This is the mechanism that makes gint a hypervisor of sorts: the OS never learns that someone else drove its hardware in the meantime.
+
+On the ClassPad this mechanism is much less central than on the other calculators. gint talks to the filesystem through Hollyhock's `File_*` functions directly, with no switch, and there is no OS menu to reach. You will rarely need `gint_world_switch()`. `gint_world_sync()` is still relevant to wait for asynchronous driver work to finish.
+
+## Drawing
+
+The drawing API is the `d*` family from `<gint/display.h>`: `dclear()`, `drect()`, `dline()`, `dcircle()`, `dpoly()`, `dtext()`, `dimage()`, and friends. All of them draw into the VRAM pointer `gint_vram`, a `uint16_t *` buffer of 320x528 pixels. Nothing reaches the panel until you call `dupdate()`.
+
+Colors are 16-bit RGB565, big-endian, the format the controller consumes. Build them with `C_RGB(r, g, b)`, three channels of 5 bits, or use the named colors `C_WHITE`, `C_BLACK` and so on. `C_NONE` means transparent in functions that support it.
+
+On the fx-CG 50, `dupdate()` hands the frame to the DMA controller and returns early, which is why that port can afford triple buffering. The ClassPad port has no working DMA path yet, so [dupdate()](https://github.com/ClasspadDev/gint/blob/dev/src/render-cg/dupdate.c) does the whole job on the CPU: it programs the R61523 window registers and writes all 337920 bytes through the 16-bit bus, one store at a time. This is a large, synchronous cost, and it is paid while your program is blocked.
+
+The consequence for design is simple. Render a complete frame, call `dupdate()` once, then go do your computation, then render the next frame. Avoid pushing partial frames in a loop. Measure with `prof` if frame budget matters to you, and remember that the numbers from fx-CG 50 discussions do not transfer: different bus, different driver. Two smaller controls are available: `dwindow_set()` clips all rendering to a sub-rectangle, and `dupdate_set_hook()` registers a callback invoked after each update, meant for capturing frames to another medium.
+
+Text goes through topti, gint's font engine. gint ships a default font; `dfont()` installs another one, and fonts are produced from PNG or template files by fxconv at build time. Text rendering supports proportional and monospaced fonts, colors, and alignment through `dtext_opt()` and `dprint()` (printf-style).
+
+Images use the `image_t` model from `<gint/image.h>`. Formats are RGB565, RGB565 with one transparent color, and 8-bit or 4-bit palette variants of both.
+
+| Format | Storage | Pixel size |
+| --- | --- | --- |
+| `IMAGE_RGB565` | Direct 16-bit color | 2 bytes |
+| `IMAGE_RGB565A` | Direct 16-bit color, one transparent | 2 bytes |
+| `IMAGE_P8_RGB565A` | 8-bit palette index | 1 byte |
+| `IMAGE_P4_RGB565A` | 4-bit palette index | half a byte |
+
+Indexed formats save memory and render faster at the cost of a palette, which makes P8 the usual choice for sprites. Rendering handles transparent and palette formats, and a set of transform functions (scaling, rotation, hflip) exists in the image library. fxconv converts your PNG assets into these formats during the build; the palette is extracted automatically, or provided explicitly if you need fixed indices.
+
+## Input and time
+
+The keyboard is a KEYSC matrix scanned by a hardware timer. gint runs the scan at 128 Hz by default, configurable from 64 Hz to 32768 Hz with `keysc_set_scan_frequency()`. Each tick produces the raw 12-byte matrix state, compares it with the previous one, and generates events.
+
+The event model in `<gint/keyboard.h>` is a queue of `key_event_t`. Each event has a type (`KEYEV_DOWN`, `KEYEV_UP`, `KEYEV_HOLD` for repeats), a keycode, a timestamp in scan cycles, and modifier flags for SHIFT and ALPHA. You read the queue with `pollevent()` (non-blocking), `waitevent()` (blocking), or drain it with `clearevents()`. The alternative style is `getkey()`, a blocking call that handles modifiers, key repetition, and the MENU key for you, closer to the OS's GetKey(). Event-driven code with `pollevent()` suits games; `getkey()` suits text input and menus. On the ClassPad, keep in mind that the MENU key brings up nothing: the OS menu path in `getkey()` targets the other models and ends in a no-op here.
+
+The touchscreen plugs into the same queue. It is an I2C device; the driver reads raw samples from the controller over I2C and, on every keyboard scan tick, converts them with a calibration table into screen coordinates. Touch events have types `KEYEV_TOUCH_DOWN`, `KEYEV_TOUCH_DRAG` and `KEYEV_TOUCH_UP`, and carry `x` and `y` fields. The calibration data comes from `touch_calib_get()`, which can read the OS's own calibration. One event per scan tick is the maximum rate, so touch input has the granularity of the 128 Hz scan, not of the I2C device.
+
+One keyboard behavior is baked into the kernel and worth knowing before it surprises you: pressing SHIFT, 7, 3 and AC/ON together calls `abort()` and kills the add-in. This is the freeze escape hatch inherited from the other models.
+
+Time comes from two places. The TMU timers are the precise ones: `timer_configure(TIMER_ANY, delay, callback)` gives you a periodic callback, with a resolution of about 250 ns on a TMU and about 30 us on the extra ETMU timers. The SH7305 has three TMUs and six ETMUs, and gint uses one ETMU for the keyboard scan, so plan for the count. Sub-millisecond delays are realistic. The RTC is coarser but absolute: `rtc_ticks()` returns 128 Hz ticks since midnight, and `rtc_get_time()` gives the calendar. Use a timer for frame pacing, the RTC for wall-clock time.
+
+For measurement, `<gint/prof.h>` runs a TMU as a free-running counter. `prof_enter()` and `prof_leave()` bracket a region, and `prof_time()` converts the elapsed counts to microseconds. `prof_exec({ ... })` measures a one-shot block in a single expression.
+
+## Memory allocation
+
+`malloc()` in a gint program goes through fxlibc's hardware abstraction layer into `kmalloc()`, the allocator in [src/kmalloc/](https://github.com/ClasspadDev/gint/blob/dev/src/kmalloc/kmalloc.c). kmalloc manages several independent arenas; a plain `malloc()` searches the default arenas in turn.
+
+On the ClassPad the picture is minimal. There is no static RAM arena like on the other models, since all of your static RAM is inside the load region already. The only default arena is the OS heap, which wraps `Mem_Malloc` and `Mem_Free` from the symbol table. So a heap allocation is a call into Hollyhock's allocator, operating on the Casio OS's own heap, which is outside your 330 KiB and typically much larger.
+
+You can add arenas yourself with `kmalloc_init_arena()` and `kmalloc_add_arena()`. The classic use is to carve a block out of on-chip memory or out of memory you own, either for speed or to control fragmentation. `kmalloc_max()` grabs the largest block of an arena whole. Arenas managed by gint's allocator also track statistics (live blocks, peak, total volume, failures) that you can read for debugging.
+
+Two practical warnings. First, memory you allocate on the OS heap never frees back into your load region, so the split is rigid: static data shrinks your program, heap data does not. Second, the OS heap is shared with the OS and the launcher. Fragmentation there is real: prefer few, long-lived allocations over many small ones, free everything, and do not assume allocation order will keep the heap tidy. For a game, the usual pattern is to allocate all buffers once at startup and never call malloc after that.
+
+## Files, USB and serial
+
+The calculator's storage uses the Fugue filesystem. gint's POSIX layer (`open()`, `read()`, `write()`, `opendir()` and the rest, from `<gint/fs.h>` and the standard headers) is implemented on top of Fugue in [src/fs/fugue/](https://github.com/ClasspadDev/gint/blob/dev/src/fs/fugue/fugue.c). On the other platforms this layer has to drop back to the OS with a world switch before every BFile call. On the ClassPad it does not: the `File_*` functions resolved at boot are called directly, so file access is available at any time, including from inside interrupt callbacks if you are careful.
+
+Paths are ordinary strings in the Fugue style, rooted at the flash volume. The 16-bit `FONTCHARACTER` encoding of the other models is gone; this is a plain `char *` interface, closer to POSIX, with its own errno-style error codes that the fugue layer maps to standard `errno` values. Fugue itself is slow, especially for writes; do not expect filesystem calls inside a frame loop. One implementation detail is worth knowing: Fugue cannot write data that sits in flash-mapped ROM, so `write()` on a constant buffer first copies it to a RAM block. Passing large read-only buffers to `write()` therefore costs an extra copy.
+
+USB is a different story. gint has a full USB driver with a class framework and the fxlink bulk transfer class, but it is not working on the ClassPad port yet. The driver may be present in the binary, but do not build features on it. Serial support is in the same category: the header `<gint/serial.h>` exists, the implementation does not. Write code as if neither exists, and check the gint repository's TODO for port status if you want to follow the work.
+
+:::caution
+USB and serial are not functional on the ClassPad port. Do not call `usb_open()`, the fxlink functions, or the serial API; they will not do what you expect.
+:::
+
+## How to think when you code for gint
+
+Your program owns the machine. There is no scheduler, no other process, no preemption except interrupts you configured. Your `main()` loop is free to spin at full speed, and every microsecond it does not spend is wasted. This is the entire performance argument for gint.
+
+A few habits that follow from the hardware:
+
+- Think integer. Software floating point costs orders of magnitude more than integer math. Use fixed-point with shifts, or precompute tables.
+- Keep static data small. Every global and every string literal sits in your 330 KiB load region, along with all the code. Large tables belong in flash-friendly read-only sections, and buffers in the heap.
+- Respect the frame budget. Draw the frame, call `dupdate()` once, then compute. If you need to know where the time goes, `prof_exec()` gives you exact numbers.
+- Allocate once. Collect all your buffers at startup, free them on exit, and keep the OS heap stable in between.
+- Sleep when idle. If you are waiting on input or time, `sleep()` inside the wait loop; the CPU costs nothing while halted.
+- Pair `cpu_atomic_start()` and `cpu_atomic_end()` around manipulation of shared state, and use `volatile` for anything an interrupt handler or a peripheral can change behind your back.
+- Do not rely on exiting. There is no menu to return to and no save state; design the program to run until the user is done, then exit cleanly.
+
+Where to look next:
+
+- The gint repository's TODO tracks the ClassPad port status: what works, what is in progress, what is not.
+- gintctl is gint's test and monitoring program; its sources show drivers, rendering and profiling used at full depth (currently targeted at the other models, but the patterns transfer).
+- JustUI, the widget toolkit that pairs with gint, is worth reading before building any nontrivial interface; see the JustUI sources.
+- The `include/gint/` headers are heavily documented and are the real API reference; start with `gint.h`, `display.h`, `keyboard.h` and `timer.h`.

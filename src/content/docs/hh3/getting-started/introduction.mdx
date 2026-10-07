@@ -7,24 +7,21 @@ sidebar:
 
 import { LinkCard, CardGrid, Icon } from '@astrojs/starlight/components';
 
-HollyHock3 (successor of HollyHock2) operates as a modification (mod) for Classpad calculators, utilizing a **custom ROM** for enhanced functionality to make your calculator do even more **awesome things**. To make HHK work, you gotta **install it on your calculator**. If you haven't done this yet, we have a **simple guide** to help you out. Just go to our **[🛠️ calculator patching guide](/wiki/reference/install/)** to learn how to do it.
+HollyHock3, the successor of [Hollyhock2](/wiki/getting-started/introduction/), operates as a modification (mod) for Classpad calculators. It uses a custom ROM for enhanced functionality, so your calculator can do even more awesome things. To make HHK work, you have to install it on your calculator. If you haven't done this yet, we have a simple guide to help you out. Just go to our [🛠️ calculator patching guide](/wiki/reference/install/) to learn how to do it.
+
+This section of the wiki is about the HH3 SDK, the successor of the HH2 SDK. It keeps similar libraries and the same ease of portability, so most of your old knowledge still applies. It is a good choice when you want to play nicely with the Casio OS, use newer C++ features, and try experimental features. It is also the easiest way to start, because most of the wiki docs are written for it. It is not always the best choice: if you want the best performance for games, the [gint kernel](/wiki/gint/getting-started/introduction/) talks to the hardware directly and is usually faster.
 
 :::tip[ClassPadDev community]
 Let's just talk about our **Discord community** for a second. HollyHock3 is a project led by the community, meaning **everyone** plays a part in **making it better**. So, if you ever have **questions** or want to be part of **something cool**, **[💬 Join our Discord community](https://discord.gg/knpcNJTzpd)** ! We're all about making HHK awesome together.
 :::
 
-
-## HollyHock-3 Beta (V3)
-
-:::caution[Beta Version]
-HollyHock-3 (V3) is currently in **beta development**. We're actively moving packages and applications to the new version, so some features may not work completely as expected. Stay tuned for the official V3 release when everything is fully functional!
-:::
+## HollyHock-3 (V3)
 
 HollyHock-3 represents the next generation of Classpad development with improved performance, better SDK organization, and enhanced tooling capabilities. While we're working hard to make everything compatible, you may encounter some differences from V2.
 
 ### V3 Templates
 
-For those wanting to try the new V3 beta, tThe **easiest way** to start is by setting up a **Github Codespace**. You'll get **coding instantly** without the need to download or configure anything on your computer.
+For those wanting to try the new V3 beta, the **easiest way** to start is by setting up a **Github Codespace**. You'll get **coding instantly** without the need to download or configure anything on your computer.
 
 We currently have two template options:
 
@@ -45,7 +42,7 @@ We currently have two template options:
     </div>
 </CardGrid>
 
-> *If GitHub prompts for login, you'll need to **create a GitHub account** to use Codespaces. Don't worry, it's a **quick and free** process! Plus, enjoy 120 hours of free usage per month – more than enough to dive into coding, create cool apps, and kickstart your development journey*.
+> *If GitHub prompts for login, you'll need to **create a GitHub account** to use Codespaces. Don't worry, it's a **quick and free** process! Plus, enjoy 120 hours of free usage per month, more than enough to dive into coding, create cool apps, and kickstart your development journey*.
 
 
 For advanced users, alternative methods are available, but **for beginners**, we highly **recommend** starting with **Codespaces** for the **quickest and user-friendly experience**. Dive into **coding effortlessly** and build your projects with confidence by taking a look at the **tutorial**
@@ -67,64 +64,36 @@ To better understand what's changed in V3, you can compare the CPDoom migration:
         description="Original V2 version of CPDoom for comparison with V3 changes"
 />
 
-:::note[Coming Soon]
-Python support will be ported to HHK3 (V3) in a later update. We're focusing on core SDK first.
-:::
-
 
 ## Advanced Development Setup
 
-For advanced users who want to create custom development environments or CI/CD pipelines, you can easily build Docker images from our toolchain:
+Most people should start with one of the templates above. But if you want your own development environment, or you want to set up CI/CD, the reference setup is the devcontainer of the HHK3 template. Its [Dockerfile](https://github.com/QBos07/HHK3template/blob/main/.devcontainer/Dockerfile) uses `ghcr.io/classpaddev/hollyhock-3:v2.2.2` as the toolchain stage, then copies `/toolchain` (the compiler) and `/sdk` (the prebuilt SDK) into a Debian 13 base. On top of that it adds make, git, mold, clangd-19 and bear.
 
 ```dockerfile
-FROM ghcr.io/classpaddev/hollyhock-3:v2.1.1 AS toolchain
-
-FROM mcr.microsoft.com/devcontainers/base:debian12 AS base
-
-# Install required packages KEEP IN SYNC (+clangd bear python nano)
-RUN apt-get update -y && apt-get upgrade -y && \
-    apt-get install -y --no-install-recommends \
-    make libncurses6 zstd zlib1g \
-    gawk wget bzip2 xz-utils unzip \
-    patch libstdc++6 rsync git mold \
-    nano clangd-19 bear python3 python-is-python3
-RUN apt-get install -y --reinstall ca-certificates
-COPY --from=toolchain /toolchain /toolchain
-COPY --from=toolchain /sdk /sdk
-ENV PATH=$PATH:/toolchain/bin
-ENV SDK_DIR=/sdk
+FROM ghcr.io/classpaddev/hollyhock-3:v2.2.2 AS toolchain
 ```
 
-### CI/CD Pipeline Example
+### Windows
 
-You can also set up automated builds using GitHub Actions:
+Install [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/) (with WSL2) and [VSCode](https://code.visualstudio.com/) with the "Dev Containers" extension. Open the HHK3template folder in VSCode. When VSCode asks to "Reopen in Container", accept it. You now get a ready terminal with the compiler at `/toolchain`.
 
-```yaml
-name: C/C++ CI
+### Linux
 
-on:
-  push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+The same works with [Docker Desktop](https://docs.docker.com/desktop/setup/install/linux-install/), but the lightest path is podman with VSCode. Install podman and podman-compose (or use the docker-mirror from the podman-docker package). Then install the Dev Containers extension and set it to use podman. On Arch Linux this is what the maintainers use day to day.
 
-jobs:
-  build:
-    permissions:
-      contents: read
-      
-    runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/classpaddev/hollyhock-3:v2.1.1
-      credentials:
-       username: ${{ github.actor }}
-       password: ${{ secrets.github_token }}
+You can also pull the image directly with `docker pull ghcr.io/classpaddev/hollyhock-3:v2.2.2`. With podman the same command works. Or you can build it yourself from the Dockerfile in the template repository.
 
-    steps:
-    - uses: actions/checkout@v4
-    - name: make
-      run: make
-    - uses: actions/upload-artifact@v4
-      with:
-        path: dist
-```
+### Recommended VSCode extensions
+
+These come from the template's devcontainer config:
+
+- `ms-vscode.makefile-tools`: Makefile support.
+- `ms-vscode.cpptools` and `ms-vscode.cpptools-themes`: C and C++ support, plus color themes.
+- `llvm-vs-code-extensions.vscode-clangd`: code intelligence. The template already sets it up with the right cross-compiler driver.
+- `xaver.clang-format`: code formatting.
+- `ZixuanWang.linkerscript`: linker script highlighting.
+- `ms-azuretools.vscode-docker`: Docker integration.
+
+### CI/CD
+
+For automated builds, look at the GitHub Actions of the HHK3 template, which is a working example: [HHK3template actions](https://github.com/QBos07/HHK3template/actions). It builds the project on every push and pull request using the same toolchain image.

@@ -11,65 +11,106 @@ import { group } from './config/sidebar';
  *
  */
 export const sidebar = [
-        group('HHK', {
+        // The legacy V2 (Hollyhock-2 SDK) docs under getting-started/, reference/,
+        // tutorials/ and examples/ are intentionally not listed in the menu anymore.
+        // The V2 era is now the gint era: the old content is kept and still reachable
+        // through links (e.g. from the HH3 introduction) but hidden from quick access.
+        group('Gint', {
             items: [
                 {
                     label: 'Get Started',
-                    items: [
-                        { label: 'Introduction', link: '/getting-started/introduction/' },
-                        { label: 'Building', link: '/getting-started/building/' },
-                    ],
+                    autogenerate: { directory: 'gint/getting-started' },
                 },
-                // {
-                // 	label: 'Guides',
-                // 	collapsed: true,
-                // 	autogenerate: { directory: 'guides' },
-                // 	items: [
-                // 		// Each item here is one entry in the navigation menu.
-                // 		{ label: 'Example Guide', link: '/guides/example/' },
-                // 	],
-                // },
                 {
                     label: 'Reference',
                     collapsed: true,
                     items: [
                         {
-                            label: '📱 GUI',
+                            label: '🖥️ Kernel',
                             collapsed: true,
-                            autogenerate: { directory: 'reference/gui' },
-
+                            autogenerate: { directory: 'gint/reference/kernel' },
                         },
                         {
-                            label: '📟 OS',
+                            label: '📚 LIBS',
                             collapsed: true,
-                            autogenerate: { directory: 'reference/os' },
-
-                        },
-                        {
-                            label: '🧮 CPU',
-                            collapsed: true,
-                            autogenerate: { directory: 'reference/cpu' },
-
-                        },
-                        {
-                            label: '🖩 CALC',
-                            collapsed: true,
-                            autogenerate: { directory: 'reference/calc' },
-
+                            autogenerate: { directory: 'gint/reference/libraries' },
                         }
                     ]
                 },
                 {
                     label: 'Tutorials',
-                    autogenerate: { directory: 'tutorials' },
+                    autogenerate: { directory: 'gint/tutorials' },
                 },
                 {
                     label: 'Examples',
                     collapsed: true,
-                    autogenerate: { directory: 'examples' },
+                    autogenerate: { directory: 'gint/examples' },
                 }
             ]
         }),
+        // ---- Legacy V2 (Hollyhock-2 SDK) sidebar group ----
+        // The V2 docs are hidden from the menu but the content is kept.
+        // Old links keep working; the V2 pages are still reachable directly.
+        // group('HHK-V2 (legacy)', {
+        // hidden: true,
+        // items: [
+        // {
+        // label: 'Get Started',
+        // items: [
+        // { label: 'Introduction', link: '/getting-started/introduction/' },
+        // { label: 'Building', link: '/getting-started/building/' },
+        // ],
+        // },
+        // // {
+        // // 	label: 'Guides',
+        // // 	collapsed: true,
+        // // 	autogenerate: { directory: 'guides' },
+        // // 	items: [
+        // // 		// Each item here is one entry in the navigation menu.
+        // // 		{ label: 'Example Guide', link: '/guides/example/' },
+        // // 	],
+        // // },
+        // {
+        // label: 'Reference',
+        // collapsed: true,
+        // items: [
+        // {
+        // label: '📱 GUI',
+        // collapsed: true,
+        // autogenerate: { directory: 'reference/gui' },
+
+        // },
+        // {
+        // label: '📟 OS',
+        // collapsed: true,
+        // autogenerate: { directory: 'reference/os' },
+
+        // },
+        // {
+        // label: '🧮 CPU',
+        // collapsed: true,
+        // autogenerate: { directory: 'reference/cpu' },
+
+        // },
+        // {
+        // label: '🖩 CALC',
+        // collapsed: true,
+        // autogenerate: { directory: 'reference/calc' },
+
+        // }
+        // ]
+        // },
+        // {
+        // label: 'Tutorials',
+        // autogenerate: { directory: 'tutorials' },
+        // },
+        // {
+        // label: 'Examples',
+        // collapsed: true,
+        // autogenerate: { directory: 'examples' },
+        // }
+        // ]
+        // }),
         group('HH3', {
             items: [
                 {
@@ -149,6 +190,7 @@ export const sidebar = [
         group('Misc', {
             collapsed: true,
             items: [
+                { label: 'FAQ', link: '/faq/' },
                 {
                     label: 'Developer Notes',
                     autogenerate: { directory: 'dev' },

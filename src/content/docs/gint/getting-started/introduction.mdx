@@ -1,0 +1,62 @@
+---
+title: Introduction
+description: gint, the alternative unikernel for ClassPad development
+sidebar:
+  order: 1
+---
+
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+
+gint (pronounced "guin") is an add-in unikernel for Casio calculators. It was created by Lephenixnoir (Lephe), ported to the ClassPad by Lephe for Hollyhock-2, then by QBoss for Hollyhock-3, with the contribution of community members. What does "unikernel" mean for you? A gint program takes control of the calculator's hardware from the Casio OS and manages it with its own drivers. Your app talks directly to the hardware instead of asking the Casio system to do things for you.
+
+On ClassPad, nothing changes about how you run the app: a gint app is still a regular `.hh3` file loaded by the Hollyhock-3 launcher (YAL). The difference happens right after. Instead of handing control to your Casio OS code, the launcher hands control to the gint kernel, and from that moment your app is the boss of the machine.
+
+There are two ways to build native add-ins on ClassPad: gint and the [Hollyhock-3 SDK](/wiki/hh3/getting-started/introduction/). Both produce the same `.hh3` files, so for the user they look identical. We recommend gint for games and anything that needs performance, and the Hollyhock SDK for regular programs. If you learned [Python](/wiki/python/introduction/) on the calculator first, gint will feel familiar since the Python support is built on it. If you want newer C++ and experimental features, the Hollyhock SDK is the better choice.
+
+One thing to keep in mind: gint programs on the ClassPad are largely limited in size. The whole program has to fit in a fixed load region of about 330 KiB (337,920 bytes, an area the calculator uses as a VRAM backup) defined by the gint linker script.
+
+## What gint offers on ClassPad
+
+The ClassPad port (gint 2.11.0) already gives you a lot of powerful hardware access:
+
+- An own LCD driver for the fx-CP400 screen (Renesas R61523, 320×528 portrait RGB565), with efficient rendering functions (`dclear`, `dtext`, image rendering, and more).
+- KEYSC keyboard support plus an I2C touchscreen driver, so you get real touch events with x/y coordinates.
+- Hardware timers with sub-millisecond resolution. Great for games and animation.
+- Interrupt management, user-extendable and efficient.
+- A memory allocator (kmalloc).
+- Fugue filesystem access, so you can read and write the files the calculator already uses.
+
+In general, better performance is the main reason games are built with gint. When your code owns the hardware, every cycle counts.
+
+## Current limitations on ClassPad (for now)
+
+We want to be honest with you: the ClassPad port is still young, and a few things are not available yet:
+
+- Serial communication is not available yet. There is no serial/UART driver on the CP400 port.
+- DMA is not working yet, so display updates are CPU-driven for now.
+- USB is not functional yet on the ClassPad port.
+- No overclock control from gint yet.
+- A gint app does not return to the Casio menu when it exits. The launcher regains control, and there is no way back into the OS until it is restarted.
+
+These are all port progress items, not permanent limitations. The underlying hardware (and in many cases the upstream gint code) already supports them. Stay tuned!
+
+## Templates to get you started
+
+<CardGrid>
+    <LinkCard
+        title="📱 HHK3 Native Template"
+        href="https://github.com/QBos07/HHK3template"
+        description="Recommended starting point: the Hollyhock-3 native SDK template"
+    />
+    <LinkCard
+        title="⛩️ Gint + JustUI Template"
+        href="https://github.com/TheRainbowPhoenix/USB_test"
+        description="Gint template in C with JustUI, touchscreen-ready. For a bare-bones alternative, see the gint-template repository"
+    />
+</CardGrid>
+
+:::note[Toolchains are completely separate]
+You cannot mix gint headers with the native SDK. They are two independent worlds, each with its own compiler and libraries. The good news: each template comes with its own Docker image / devcontainer, so there is nothing to configure manually. Open the template and start coding!
+:::
+
+Ready to build? Head over to [building your app](/wiki/gint/getting-started/building/) next.

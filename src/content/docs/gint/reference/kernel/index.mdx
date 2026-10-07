@@ -1,0 +1,128 @@
+---
+title: Kernel API
+description: Reference for the gint kernel API on ClassPad
+sidebar:
+  order: 0
+---
+
+This is the API reference for the **gint kernel headers**. The ClassPad port of gint targets **fxCP** (the fx-CP400). Some pages document hardware that only exists on other models (fx-9860G and fx-CG 50 only: `display-fx`, `gray`, `t6k11`, `r61524`). Those pages are included for completeness and do not fully apply to the ClassPad.
+
+## Core Modules
+
+- [gint](/wiki/gint/reference/kernel/gint/) - Main gint header with initialization and core functions
+- [hardware](/wiki/gint/reference/kernel/hardware/) - Hardware detection and platform information
+- [cpu](/wiki/gint/reference/kernel/cpu/) - CPU identification and features
+- [clock](/wiki/gint/reference/kernel/clock/) - Clock frequency and timing utilities
+- [timer](/wiki/gint/reference/kernel/timer/) - Timer management and sleep functions
+
+## Display and Graphics
+
+- [Display](/wiki/gint/reference/kernel/display/) - Drawing functions for both platforms
+- [Display: fx-9860G](/wiki/gint/reference/kernel/display-fx/) - fx-9860G display specifics
+- [Display: fx-CG 50](/wiki/gint/reference/kernel/display-cg/) - fx-CG 50 display specifics
+- [Gray](/wiki/gint/reference/kernel/gray/) - Gray engine for fx-9860G
+- [Image](/wiki/gint/reference/kernel/image/) - Image manipulation and rendering
+- [Video](/wiki/gint/reference/kernel/video/) - Video capture and output
+
+## Input
+
+- [Keyboard](/wiki/gint/reference/kernel/keyboard/) - Keyboard scanning and input
+- [Keycodes](/wiki/gint/reference/kernel/keycodes/) - Key code definitions
+
+## Memory Management
+
+- [kmalloc](/wiki/gint/reference/kernel/kmalloc/) - Kernel memory allocator
+- [MMU](/wiki/gint/reference/kernel/mmu/) - Memory management unit control
+
+## File System
+
+- [Filesystem](/wiki/gint/reference/kernel/fs/) - File system operations
+- [BFile](/wiki/gint/reference/kernel/bfile/) - BFile API for file access
+
+## Drivers
+
+- [Drivers](/wiki/gint/reference/kernel/drivers/) - Driver framework overview
+- [Driver: asyncio](/wiki/gint/reference/kernel/drivers/asyncio/) - Asynchronous I/O driver
+- [Driver: iokbd](/wiki/gint/reference/kernel/drivers/iokbd/) - Keyboard I/O driver
+- [Driver: keydev](/wiki/gint/reference/kernel/drivers/keydev/) - Key device driver
+- [Driver: r61523](/wiki/gint/reference/kernel/drivers/r61523/) - R61523 display controller
+- [Driver: r61524](/wiki/gint/reference/kernel/drivers/r61524/) - R61524 display controller
+- [Driver: states](/wiki/gint/reference/kernel/drivers/states/) - Power state management
+- [Driver: t6k11](/wiki/gint/reference/kernel/drivers/t6k11/) - T6K11 display controller
+
+## MPU (Microprocessor Unit)
+
+- [MPU: BSC](/wiki/gint/reference/kernel/mpu/bsc/) - Bus state controller
+- [MPU: CPG](/wiki/gint/reference/kernel/mpu/cpg/) - Clock pulse generator
+- [MPU: DMA](/wiki/gint/reference/kernel/mpu/dma/) - Direct memory access
+- [MPU: INTC](/wiki/gint/reference/kernel/mpu/intc/) - Interrupt controller
+- [MPU: MMU](/wiki/gint/reference/kernel/mpu/mmu/) - Memory management unit
+- [MPU: PFC](/wiki/gint/reference/kernel/mpu/pfc/) - Pin function controller
+- [MPU: Power](/wiki/gint/reference/kernel/mpu/power/) - Power management
+- [MPU: RTC](/wiki/gint/reference/kernel/mpu/rtc/) - Real-time clock
+- [MPU: SCIF](/wiki/gint/reference/kernel/mpu/scif/) - Serial communication interface
+- [MPU: SPU](/wiki/gint/reference/kernel/mpu/spu/) - Sound processing unit
+- [MPU: TMU](/wiki/gint/reference/kernel/mpu/tmu/) - Timer module unit
+- [MPU: UBC](/wiki/gint/reference/kernel/mpu/ubc/) - User break controller
+- [MPU: USB](/wiki/gint/reference/kernel/mpu/usb/) - USB controller
+- [MPU: WDT](/wiki/gint/reference/kernel/mpu/wdt/) - Watchdog timer
+
+## USB
+
+- [USB](/wiki/gint/reference/kernel/usb/) - USB stack and device management
+- [USB: FF-Bulk](/wiki/gint/reference/kernel/usb-ff-bulk/) - Full-speed bulk transfer class
+
+## System Utilities
+
+- [DMA](/wiki/gint/reference/kernel/dma/) - DMA helper functions
+- [INTC](/wiki/gint/reference/kernel/intc/) - Interrupt handling
+- [RTC](/wiki/gint/reference/kernel/rtc/) - RTC helper functions
+- [Serial](/wiki/gint/reference/kernel/serial/) - Serial port utilities
+- [UBC](/wiki/gint/reference/kernel/ubc/) - Debug breakpoints
+- [Exceptions](/wiki/gint/reference/kernel/exc/) - Exception handling
+- [GDB](/wiki/gint/reference/kernel/gdb/) - GDB stub for debugging
+
+## Standard Library
+
+- [Std: stdio](/wiki/gint/reference/kernel/std/stdio/) - Standard I/O functions
+- [Std: stdlib](/wiki/gint/reference/kernel/std/stdlib/) - Standard library utilities
+- [Std: string](/wiki/gint/reference/kernel/std/string/) - String manipulation
+- [Std: endian](/wiki/gint/reference/kernel/std/endian/) - Byte order conversion
+
+## Type Definitions and Utilities
+
+- [Defs: types](/wiki/gint/reference/kernel/defs/types/) - Basic type definitions
+- [Defs: attributes](/wiki/gint/reference/kernel/defs/attributes/) - Compiler attributes
+- [Defs: GINT_CALL](/wiki/gint/reference/kernel/defs/call/) - Indirect call mechanism
+- [Defs: timeout](/wiki/gint/reference/kernel/defs/timeout/) - Timeout handling
+- [Defs: util](/wiki/gint/reference/kernel/defs/util/) - Utility macros and functions
+
+## JustUI Framework
+
+The [JustUI widget library](/wiki/gint/reference/libraries/justui/) has its own reference section:
+
+- [defs](/wiki/gint/reference/libraries/justui/defs/) - JustUI definitions
+- [jbutton](/wiki/gint/reference/libraries/justui/jbutton/) - Button widget
+- [jevent](/wiki/gint/reference/libraries/justui/jevent/) - Event system
+- [jfileselect](/wiki/gint/reference/libraries/justui/jfileselect/) - File selection dialog
+- [jfkeys](/wiki/gint/reference/libraries/justui/jfkeys/) - Function keys
+- [jframe](/wiki/gint/reference/libraries/justui/jframe/) - Main window frame
+- [jinput](/wiki/gint/reference/libraries/justui/jinput/) - Input widget
+- [jlabel](/wiki/gint/reference/libraries/justui/jlabel/) - Label widget
+- [jlayout](/wiki/gint/reference/libraries/justui/jlayout/) - Layout management
+- [jlist](/wiki/gint/reference/libraries/justui/jlist/) - List widget
+- [jpainted](/wiki/gint/reference/libraries/justui/jpainted/) - Painted widget
+- [jscene](/wiki/gint/reference/libraries/justui/jscene/) - Scene management
+- [jscrolledlist](/wiki/gint/reference/libraries/justui/jscrolledlist/) - Scrolled list widget
+- [jwidget](/wiki/gint/reference/libraries/justui/jwidget/) - Base widget class
+- [jwidget API](/wiki/gint/reference/libraries/justui/jwidget-api/) - Widget API reference
+- [preproc](/wiki/gint/reference/libraries/justui/p/preproc/) - Preprocessing utilities
+- [vec](/wiki/gint/reference/libraries/justui/p/vec/) - Vector utilities
+
+## Build System
+
+- [Linker Script Guide](/wiki/gint/reference/kernel/linker/) - Memory layout and section organization
+
+## Repository
+
+Source code: [ClasspadDev/gint](https://github.com/ClasspadDev/gint)
