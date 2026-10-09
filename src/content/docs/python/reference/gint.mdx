@@ -48,18 +48,19 @@ Reference headers: [`<gint/keyboard.h>`](https://gitea.planet-casio.com/Lephenix
 
 #### Key Codes (`KEY_*`)
 These constants represent physical keys on the calculator.
-`KEY_F1`, `KEY_F2`, `KEY_F3`, `KEY_F4`, `KEY_F5`, `KEY_F6`,
-`KEY_SHIFT`, `KEY_OPTN`, `KEY_VARS`, `KEY_MENU`, `KEY_LEFT`, `KEY_UP`,
-`KEY_ALPHA`, `KEY_SQUARE`, `KEY_POWER`, `KEY_EXIT`, `KEY_DOWN`, `KEY_RIGHT`,
-`KEY_XOT`, `KEY_LOG`, `KEY_LN`, `KEY_SIN`, `KEY_COS`, `KEY_TAN`,
+
+On ClassPad, stick to these confirmed keys:
+
+`KEY_SHIFT`,
+`KEY_LEFT`, `KEY_UP`, `KEY_EXIT`, `KEY_DOWN`, `KEY_RIGHT`,
 `KEY_FRAC`, `KEY_FD`, `KEY_LEFTP`, `KEY_RIGHTP`, `KEY_COMMA`, `KEY_ARROW`,
 `KEY_7`, `KEY_8`, `KEY_9`, `KEY_DEL`,
 `KEY_4`, `KEY_5`, `KEY_6`, `KEY_MUL`, `KEY_DIV`,
 `KEY_1`, `KEY_2`, `KEY_3`, `KEY_ADD`, `KEY_SUB`,
 `KEY_0`, `KEY_DOT`, `KEY_EXP`, `KEY_NEG`, `KEY_EXE`,
-`KEY_ACON`, `KEY_HELP`, `KEY_LIGHT`,
-`KEY_X2`, `KEY_CARET`, `KEY_SWITCH`, `KEY_LEFTPAR`, `KEY_RIGHTPAR`,
-`KEY_STORE`, `KEY_TIMES`, `KEY_PLUS`, `KEY_MINUS`, `KEY_KBD`, `KEY_EQUALS`.
+`KEY_KBD`, `KEY_X`, `KEY_Y`, `KEY_Z`, `KEY_EQUALS`.
+
+`KEY_CLEAR` is an alias for `KEY_EXIT`.
 
 #### Event Types (`KEYEV_*`)
 These constants describe the type of a `KeyEvent`.
@@ -73,7 +74,7 @@ These constants describe the type of a `KeyEvent`.
 
 #### `getkey_opt` Options (`GETKEY_*`)
 These flags are combined to configure `getkey_opt`.
-`GETKEY_MOD_SHIFT`, `GETKEY_MOD_ALPHA`, `GETKEY_BACKLIGHT`, `GETKEY_MENU`, `GETKEY_REP_ARROWS`, `GETKEY_REP_ALL`, `GETKEY_REP_PROFILE`, `GETKEY_FEATURES`, `GETKEY_NONE`, `GETKEY_DEFAULT`.
+`GETKEY_MOD_SHIFT`, `GETKEY_REP_ARROWS`, `GETKEY_REP_ALL`, `GETKEY_REP_PROFILE`, `GETKEY_FEATURES`, `GETKEY_NONE`, `GETKEY_DEFAULT`.
 
 ### Keyboard Functions
 
@@ -134,7 +135,7 @@ if gint.keydown_any(gint.KEY_LEFT, gint.KEY_RIGHT):
 #### `keypressed(key: int) -> bool`
 Returns `True` if the `key` has transitioned from up to down since the last `cleareventflips()`.
 ```py
-if gint.keypressed(gint.KEY_OPTN):
+if gint.keypressed(gint.KEY_EXE):
     open_menu()
 ```
 
@@ -155,7 +156,7 @@ if digit != -1:
 ```
 
 #### `keycode_function(keycode: int) -> int`
-Returns the number for an F-key (`1` for `KEY_F1`, etc.) or -1 for non-F-keys.
+Returns the number for an F-key on targets that have F-keys. On ClassPad, this is generally not useful and will return -1 for normal keys.
 
 #### `pollevent() -> KeyEvent`
 Retrieves the oldest event from the queue without waiting. If the queue is empty, returns a `KEYEV_NONE` event. This is the main function for non-blocking input in a game loop.

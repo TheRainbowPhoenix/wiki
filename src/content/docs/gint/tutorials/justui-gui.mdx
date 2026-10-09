@@ -1,0 +1,222 @@
+---
+title: JustUI GUI
+description: Build a touch-friendly interface with JustUI.
+sidebar:
+  order: 2
+---
+
+JustUI helps you build graphical apps without manually placing every pixel.
+
+In this tutorial, you will build a simple GUI with:
+- A fullscreen scene
+- Labels and buttons
+- Multiple tabs
+- A file picker
+- An event loop
+
+## Step 1: Link JustUI
+
+Your project must link JustUI:
+
+```cmake
+find_package(JustUI 1.0 REQUIRED)
+target_link_libraries(myaddin Gint::Gint JustUI::JustUI)
+```
+
+Most JustUI templates already do this for you.
+
+## Step 2: Create the scene
+
+The scene is the root widget:
+
+```c
+jscene *scene = jscene_create_fullscreen(NULL);
+jlayout_set_vbox(scene)->spacing = 0;
+```
+
+Here we use a vertical layout. Children will be stacked from top to bottom.
+
+## Step 3: Add a stack for tabs
+
+A stack layout contains several pages, but only shows one at a time:
+
+```c
+jwidget *stack = jwidget_create(scene);
+jlayout_set_stack(stack);
+jwidget_set_stretch(stack, 1, 1, false);
+```
+
+The stretch call makes the stack fill the available screen space.
+
+## Step 4: Add tab content
+
+Each tab is a widget inside the stack:
+
+```c
+jwidget *tab1 = jwidget_create(stack);
+jlayout_set_vbox(tab1)->spacing = 10;
+jwidget_set_padding(tab1, 15, 15, 15, 15);
+
+jlabel_create("Welcome to JustUI ClassPad!", tab1);
+jlabel_create("This is Tab 1.", tab1);
+```
+
+You can add labels, buttons, lists, or file selectors to each tab.
+
+## Step 5: Add buttons
+
+Buttons work well on the ClassPad touchscreen when they have enough padding:
+
+```c
+jbutton *btn_action = jbutton_create("Click Me!", tab2);
+jwidget_set_padding(btn_action, 15, 20, 15, 20);
+```
+
+## Step 6: Add navigation
+
+Create a bottom bar with buttons for each tab:
+
+```c
+jwidget *buttons = jwidget_create(scene);
+jlayout_set_hbox(buttons)->spacing = 6;
+jwidget_set_padding(buttons, 8, 8, 8, 8);
+
+jbutton *b_tab1 = jbutton_create("Tab 1", buttons);
+jbutton *b_tab2 = jbutton_create("Tab 2", buttons);
+jbutton *b_exit = jbutton_create("Exit", buttons);
+```
+
+## Step 7: Run the event loop
+
+JustUI apps use `jscene_run(scene)`:
+
+```c
+while (running) {
+    jevent e = jscene_run(scene);
+
+    if (e.type == JSCENE_PAINT) {
+        dclear(C_WHITE);
+        jscene_render(scene);
+        dupdate();
+    }
+}
+```
+
+The full demo below also handles button clicks and file selection events.
+
+## Final Code
+
+```c
+#include <gint/display.h>
+#include <gint/keyboard.h>
+#include <justui/jscene.h>
+#include <justui/jlabel.h>
+#include <justui/jbutton.h>
+#include <justui/jfileselect.h>
+#include <justui/jlayout.h>
+#include <justui/jwidget.h>
+#include <stdio.h>
+
+int main(void)
+{
+    jscene *scene = jscene_create_fullscreen(NULL);
+    jlayout_set_vbox(scene)->spacing = 0;
+
+    jwidget *stack = jwidget_create(scene);
+    jlayout_set_stack(stack);
+    jwidget_set_stretch(stack, 1, 1, false);
+
+    jwidget *tab1 = jwidget_create(stack);
+    jlayout_set_vbox(tab1)->spacing = 10;
+    jwidget_set_padding(tab1, 15, 15, 15, 15);
+    jlabel_create("Welcome to JustUI ClassPad!", tab1);
+    jlabel_create("This is Tab 1.", tab1);
+
+    jwidget *tab2 = jwidget_create(stack);
+    jlayout_set_vbox(tab2)->spacing = 15;
+    jwidget_set_padding(tab2, 15, 15, 15, 15);
+    jlabel_create("Features (Tab 2)", tab2);
+    jbutton *btn_action = jbutton_create("Click Me!", tab2);
+    jwidget_set_padding(btn_action, 15, 20, 15, 20);
+    jlabel *t2_status = jlabel_create("Button not clicked yet.", tab2);
+
+    jwidget *tab3 = jwidget_create(stack);
+    jlayout_set_vbox(tab3)->spacing = 0;
+    jfileselect *fileselect = jfileselect_create(tab3);
+    jfileselect_set_show_file_size(fileselect, true);
+    jwidget_set_stretch(fileselect, 1, 1, false);
+
+    jwidget *buttons = jwidget_create(scene);
+    jlayout_set_hbox(buttons)->spacing = 6;
+    jwidget_set_stretch(buttons, 1, 0, false);
+    jwidget_set_padding(buttons, 8, 8, 8, 8);
+
+    jbutton *b_tab1 = jbutton_create("Tab 1", buttons);
+    jbutton *b_tab2 = jbutton_create("Tab 2", buttons);
+    jbutton *b_tab3 = jbutton_create("Tab 3", buttons);
+
+    jwidget *spacer = jwidget_create(buttons);
+    jwidget_set_stretch(spacer, 1, 0, false);
+
+    jbutton *b_exit = jbutton_create("Exit", buttons);
+    jwidget_set_padding(b_exit, 12, 16, 12, 16);
+
+    jfileselect_browse(fileselect, "/");
+    jscene_show_and_focus(scene, tab1);
+    jbutton_set_disabled(b_tab1, true);
+
+    int action_count = 0;
+    bool running = true;
+
+    while (running) {
+        jevent e = jscene_run(scene);
+
+        if (e.type == JSCENE_PAINT) {
+            dclear(C_WHITE);
+            jscene_render(scene);
+            dupdate();
+        }
+        else if (e.type == JBUTTON_TRIGGERED) {
+            if (e.source == b_exit) {
+                running = false;
+            }
+            else if (e.source == b_tab1) {
+                jscene_show_and_focus(scene, tab1);
+                jbutton_set_disabled(b_tab1, true);
+                jbutton_set_disabled(b_tab2, false);
+                jbutton_set_disabled(b_tab3, false);
+            }
+            else if (e.source == b_tab2) {
+                jscene_show_and_focus(scene, tab2);
+                jbutton_set_disabled(b_tab1, false);
+                jbutton_set_disabled(b_tab2, true);
+                jbutton_set_disabled(b_tab3, false);
+            }
+            else if (e.source == b_tab3) {
+                jscene_show_and_focus(scene, tab3);
+                jbutton_set_disabled(b_tab1, false);
+                jbutton_set_disabled(b_tab2, false);
+                jbutton_set_disabled(b_tab3, true);
+            }
+            else if (e.source == btn_action) {
+                action_count++;
+                static char buf[64];
+                sprintf(buf, "Clicked %d times!", action_count);
+                jlabel_set_text(t2_status, buf);
+            }
+        }
+        else if (e.type == JFILESELECT_VALIDATED) {
+            char const *path = jfileselect_selected_file(fileselect);
+            if (path) printf("Selected: %s\n", path);
+        }
+        else if (e.type == JWIDGET_KEY && e.key.type == KEYEV_DOWN) {
+            if (e.key.key == KEY_EXIT || e.key.key == KEY_CLEAR) {
+                running = false;
+            }
+        }
+    }
+
+    jwidget_destroy(scene);
+    return 1;
+}
+```

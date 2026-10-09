@@ -179,7 +179,7 @@ while(running) {
     }
     // Also accept hardware exits safely
     else if (e.type == JWIDGET_KEY && e.key.type == KEYEV_DOWN) {
-        if (e.key.key == KEY_CLEAR || e.key.key == KEY_HOME) {
+        if (e.key.key == KEY_EXIT || e.key.key == KEY_CLEAR) {
             running = false;
         }
     }
@@ -320,7 +320,7 @@ int main(void)
             if (path) printf("Selected: %s\n", path);
         }
         else if (e.type == JWIDGET_KEY && e.key.type == KEYEV_DOWN) {
-            if (e.key.key == KEY_CLEAR || e.key.key == KEY_HOME) {
+            if (e.key.key == KEY_EXIT || e.key.key == KEY_CLEAR) {
                 running = false;
             }
         }

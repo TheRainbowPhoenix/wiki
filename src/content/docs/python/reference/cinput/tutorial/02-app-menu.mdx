@@ -7,7 +7,7 @@ sidebar:
 
 Now that you know how to spawn keyboards and pickers, how do you glue them together into a real app?
 
-In this tutorial, we will build a basic application shell that waits for user interaction. Instead of immediately quitting, the app runs in a loop, showing a menu when a key is pressed or the screen is tapped.
+In this tutorial, we will build a basic application shell that waits for user interaction. Instead of immediately quitting, the app runs in a loop, showing a menu when `EXE` is pressed or the screen is tapped.
 
 ## The App Shell
 
@@ -47,7 +47,7 @@ def main():
             
         for e in events:
             # Physical key fallback
-            if e.type == KEYEV_DOWN and e.key == KEY_MENU:
+            if e.type == KEYEV_DOWN and e.key == KEY_EXE:
                 handle_menu()
                 
             # Touch Area matching the hamburger icon

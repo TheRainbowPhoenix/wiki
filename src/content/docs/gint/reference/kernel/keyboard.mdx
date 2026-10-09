@@ -255,6 +255,10 @@ keycode_function(): Identify keys F1 .. F6
 This function returns number of each F-key (eg. it returns 2 for KEY_F2),
 and -1 for other keys.
 
+:::note[ClassPad]
+The ClassPad does not have the usual F1..F6 keyboard row. For ClassPad apps, use normal keys such as `KEY_EXE`, `KEY_EXIT`, arrows, digits, and operators instead.
+:::
+
 ```c
 int keycode_function(int keycode)
 ```
@@ -357,6 +361,10 @@ enum
 ```
 
 The following are the option bits for getkey_opt().
+
+:::note[ClassPad]
+Some `getkey_opt()` flags come from other gint targets. In ClassPad tutorials, avoid relying on menu or F-key behavior. Use `KEY_EXE` for confirmation/menu actions and `KEY_EXIT` or `KEY_CLEAR` to leave a screen.
+:::
 
 ```c
 enum

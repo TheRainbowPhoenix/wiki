@@ -1,0 +1,114 @@
+---
+title: First gint app
+description: Build a minimal gint app with drawing, keyboard input, and a loop.
+sidebar:
+  order: 1
+---
+
+This tutorial shows the smallest useful gint app for ClassPad.
+
+You will draw some text, update the screen, then keep a loop running until the user exits.
+
+## Step 1: Start from the ClassPad base
+
+For ClassPad builds, define `FXCP` before including gint headers:
+
+```cpp
+#define FXCP
+#include <gint/display.h>
+#include "gint/keycodes.h"
+#include <gint/keyboard.h>
+#include <gint/gint.h>
+```
+
+`display.h` gives drawing functions like `dclear`, `dtext`, and `dupdate`. `keyboard.h` gives `keydown()` and event helpers. `gint.h` gives `gint_osmenu()`.
+
+## Step 2: Create `main()`
+
+Every app starts from `main()`:
+
+```cpp
+int main() {
+    return 1;
+}
+```
+
+Returning `1` is the usual gint convention.
+
+## Step 3: Draw the first screen
+
+Inside `main()`, clear the screen, draw some text, and update the LCD:
+
+```cpp
+dclear(0x2104);
+dtext(1, 1, C_BLACK, "Sample fxSDK add-in.");
+dupdate();
+```
+
+`dclear()` fills the VRAM. `dtext()` draws text into VRAM. `dupdate()` sends VRAM to the real screen.
+
+## Step 4: Add the main loop
+
+Most gint apps use a loop:
+
+```cpp
+while (true) {
+    dtext(1, 20, C_WHITE, "LOOP!");
+    dupdate();
+}
+```
+
+This keeps the app alive and lets you react to input.
+
+## Step 5: Read the keyboard
+
+Before checking keys, clear old events:
+
+```cpp
+clearevents();
+```
+
+Then check for a key:
+
+```cpp
+if (keydown(KEY_EXE)) {
+    dtext(1, 40, C_WHITE, "MENU!");
+    gint_osmenu();
+}
+if (keydown(KEY_EXIT)) {
+    return 1;
+}
+```
+
+On ClassPad, use `KEY_EXE` for an action and `KEY_EXIT` to leave. `gint_osmenu()` opens the gint OS menu.
+
+## Final Code
+
+```cpp
+#define FXCP
+#include <gint/display.h>
+#include "gint/keycodes.h"
+#include <gint/keyboard.h>
+#include <gint/gint.h>
+
+int main() {
+    dclear(0x2104);
+    dtext(1, 1, C_BLACK, "Sample fxSDK add-in.");
+    dupdate();
+
+    while (true) {
+        dtext(1, 20, C_WHITE, "LOOP!");
+        clearevents();
+        if (keydown(KEY_EXE)) {
+            dtext(1, 40, C_WHITE, "MENU!");
+            gint_osmenu();
+        }
+        if (keydown(KEY_EXIT)) {
+            return 1;
+        }
+        dupdate();
+    }
+
+    return 1;
+}
+```

@@ -158,10 +158,6 @@ export const sidebar = [
                     ]
                 },
                 {
-                    label: 'Tutorials',
-                    autogenerate: { directory: 'hh3/tutorials' },
-                },
-                {
                     label: 'Examples',
                     collapsed: true,
                     autogenerate: { directory: 'hh3/examples' },
