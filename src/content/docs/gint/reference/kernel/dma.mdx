@@ -3,6 +3,10 @@ title: "DMA"
 description: "Direct Memory Access for efficient data transfer"
 ---
 
+:::note[Unofficial documentation]
+Community-written docs, valid for the ClassPad port only, possibly slightly outdated. They will be replaced by the official gint documentation once it is published.
+:::
+
 ## Functions
 
 ### `dma_transfer_async`
@@ -128,11 +132,23 @@ Old name for dma_transfer_atomic()
 ## Types
 
 ```c
-typedef enum { /* Normal transfers of 1, 2, 4, 8, 16 or 32 bytes at a time */ DMA_1B = 0, DMA_2B = 1, DMA_4B = 2, DMA_8B = 7, DMA_16B = 3, DMA_32B = 4, /* Transfers of 16 or 32 bytes divided in two operations */ DMA_16B_DIV = 11, DMA_32B_DIV = 12, } dma_size_t
+typedef enum
+{
+  /* Normal transfers of 1, 2, 4, 8, 16 or 32 bytes at a time */ DMA_1B = 0, DMA_2B = 1, DMA_4B = 2, DMA_8B = 7, DMA_16B = 3, DMA_32B = 4, /* Transfers of 16 or 32 bytes divided in two operations */ DMA_16B_DIV = 11, DMA_32B_DIV = 12,
+}
+dma_size_t
 ```
 
 dma_address_t - Addressing mode for source and destination regions
 
 ```c
-typedef enum { /* Fixed address mode: the same address is read/written at each step */ DMA_FIXED = 0, /* Increment: address is incremented by transfer size at each step */ DMA_INC = 1, /* Decrement: only allowed for 1/2/4-byte transfers */ DMA_DEC = 2, /* Fixed division mode: address is fixed even in 16/32-divide mode */ DMA_FIXEDDIV = 3, } dma_address_t
+typedef enum
+{
+  /* Fixed address mode: the same address is read/written at each step */ DMA_FIXED = 0, /* Increment: address is incremented by transfer size at each step */ DMA_INC = 1, /* Decrement: only allowed for 1/2/4-byte transfers */ DMA_DEC = 2, /* Fixed division mode: address is fixed even in 16/32-divide mode */ DMA_FIXEDDIV = 3,
+}
+dma_address_t
 ```
+
+## Source
+
+- [Header `<gint/dma.h>`](https://github.com/ClasspadDev/gint/blob/dev/include/gint/dma.h)

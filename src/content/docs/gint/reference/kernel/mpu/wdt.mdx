@@ -3,6 +3,10 @@ title: "MPU: WDT"
 description: "Watchdog Timer"
 ---
 
+:::note[Unofficial documentation]
+Community-written docs, valid for the ClassPad port only, possibly slightly outdated. They will be replaced by the official gint documentation once it is published.
+:::
+
 ## Macros
 
 ```c
@@ -12,5 +16,31 @@ description: "Watchdog Timer"
 ## Types
 
 ```c
-typedef volatile struct { /* WDT registers are unique in access size; reads are performed with 8-bit accesses, but writes are performed with 16-bit accesses. */ union { uint8_t READ; uint16_t WRITE; } WTCNT; union { byte_union(READ, uint8_t TME :1; /* Timer Enable */ uint8_t WTIT :1; /* Watchdog/Interval Select */ uint8_t RSTS :1; /* Watchdog Reset Select */ uint8_t WOVF :1; /* Watchdog Overflow Flag */ uint8_t IOVF :1; /* Interval Overflow Flag */ uint8_t CKS :3; /* Clock Select */ ); uint16_t WRITE; } WTCSR; } sh7705_wdt_t
+typedef volatile struct
+{
+  /* WDT registers are unique in access size;
+  reads are performed with 8-bit accesses, but writes are performed with 16-bit accesses. */ union
+  {
+    uint8_t READ;
+    uint16_t WRITE;
+  }
+  WTCNT;
+  union
+  {
+    byte_union(READ, uint8_t TME :1;
+    /* Timer Enable */ uint8_t WTIT :1;
+    /* Watchdog/Interval Select */ uint8_t RSTS :1;
+    /* Watchdog Reset Select */ uint8_t WOVF :1;
+    /* Watchdog Overflow Flag */ uint8_t IOVF :1;
+    /* Interval Overflow Flag */ uint8_t CKS :3;
+    /* Clock Select */ );
+    uint16_t WRITE;
+  }
+  WTCSR;
+}
+sh7705_wdt_t
 ```
+
+## Source
+
+- [Header `<gint/mpu/wdt.h>`](https://github.com/ClasspadDev/gint/blob/dev/include/gint/mpu/wdt.h)

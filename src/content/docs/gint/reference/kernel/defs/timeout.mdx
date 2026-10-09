@@ -3,6 +3,10 @@ title: "Defs: timeout"
 description: "RTC-based timeouts"
 ---
 
+:::note[Unofficial documentation]
+Community-written docs, valid for the ClassPad port only, possibly slightly outdated. They will be replaced by the official gint documentation once it is published.
+:::
+
 
 This header provides an interface for simplistic timers used for timeout
 waiting. Currently they are based on the RTC with a resolution of 1/128 s.
@@ -28,3 +32,7 @@ static inline bool timeout_elapsed(timeout_t const *t) { return t && clock() >= 
 ```c
 typedef clock_t timeout_t
 ```
+
+## Source
+
+- [Header `<gint/defs/timeout.h>`](https://github.com/ClasspadDev/gint/blob/dev/include/gint/defs/timeout.h)

@@ -3,6 +3,10 @@ title: "Drivers"
 description: "General tools for drivers"
 ---
 
+:::note[Unofficial documentation]
+Community-written docs, valid for the ClassPad port only, possibly slightly outdated. They will be replaced by the official gint documentation once it is published.
+:::
+
 ## Functions
 
 ### `gint_world_alloc`
@@ -79,7 +83,26 @@ Number of drivers in the (gint_drivers) array
 ## Types
 
 ```c
-typedef struct { /* Driver name */ char const *name; /* General constructor, is called before any interaction with the driver. This can be used to adjust settings based on detected hardware. */ void (*constructor)(void); // Foreign calls /* Foreign unbind: separate the hardware from the OS driver. If NULL, the OS driver is always considered idle. */ void (*funbind)(void); // "Hypervisor" calls /* Determine whether the device is powered. If NULL, the device is assumed to be permanently powered. */ bool (*hpowered)(void); /* Power on the device; this should allow register access to save the peripheral state, with minimal state changes. Cannot be NULL if hpowered() can return false. */ void (*hpoweron)(void); /* Power off the device; cannot be NULL if hpowered() can return false. */ void (*hpoweroff)(void); /* Save the hardware state; the (state) pointer points to a 4-aligned region of (state_size) bytes. */ void (*hsave)(void *state); /* Restore a hardware state previously saved by hsave(). */ void (*hrestore)(void const *state); // Standard calls /* Bind the driver to acquire control of the device. May be NULL. */ void (*bind)(void); /* Unbind the driver from the hardware. Usually sleeps until processes that block world switches terminate, like bind(). May be NULL. */ void (*unbind)(void); /* Initialize the hardware for the driver to work in gint. Usually installs interrupt handlers and configures registers. May be NULL. */ void (*configure)(void); /* Size of the peripheral's hardware state (assumed 4-aligned) */ uint16_t state_size; /* Initial flags */ uint8_t flags; } gint_driver_t
+typedef struct
+{
+  /* Driver name */ char const *name;
+  /* General constructor, is called before any interaction with the driver. This can be used to adjust settings based on detected hardware. */ void (*constructor)(void);
+  // Foreign calls /* Foreign unbind: separate the hardware from the OS driver. If NULL, the OS driver is always considered idle. */ void (*funbind)(void);
+  // "Hypervisor" calls /* Determine whether the device is powered. If NULL, the device is assumed to be permanently powered. */ bool (*hpowered)(void);
+  /* Power on the device;
+  this should allow register access to save the peripheral state, with minimal state changes. Cannot be NULL if hpowered() can return false. */ void (*hpoweron)(void);
+  /* Power off the device;
+  cannot be NULL if hpowered() can return false. */ void (*hpoweroff)(void);
+  /* Save the hardware state;
+  the (state) pointer points to a 4-aligned region of (state_size) bytes. */ void (*hsave)(void *state);
+  /* Restore a hardware state previously saved by hsave(). */ void (*hrestore)(void const *state);
+  // Standard calls /* Bind the driver to acquire control of the device. May be NULL. */ void (*bind)(void);
+  /* Unbind the driver from the hardware. Usually sleeps until processes that block world switches terminate, like bind(). May be NULL. */ void (*unbind)(void);
+  /* Initialize the hardware for the driver to work in gint. Usually installs interrupt handlers and configures registers. May be NULL. */ void (*configure)(void);
+  /* Size of the peripheral's hardware state (assumed 4-aligned) */ uint16_t state_size;
+  /* Initial flags */ uint8_t flags;
+}
+gint_driver_t
 ```
 
 gint_world_t: World state capture
@@ -110,5 +133,12 @@ typedef void **gint_world_t
 ## Data structures
 
 ```c
-enum { /* Driver is clean (needs to be configured before running) */ GINT_DRV_CLEAN = 0x01, /* Device was powered during the last foreign unbind */ GINT_DRV_FOREIGN_POWERED = 0x02, /* Driver does not require hardware state saves during world switches */ GINT_DRV_SHARED = 0x10, /* Flags that can be set in the (flags) attribute of the driver struct */ GINT_DRV_INIT_ = 0x10, }
+enum
+{
+  /* Driver is clean (needs to be configured before running) */ GINT_DRV_CLEAN = 0x01, /* Device was powered during the last foreign unbind */ GINT_DRV_FOREIGN_POWERED = 0x02, /* Driver does not require hardware state saves during world switches */ GINT_DRV_SHARED = 0x10, /* Flags that can be set in the (flags) attribute of the driver struct */ GINT_DRV_INIT_ = 0x10,
+}
 ```
+
+## Source
+
+- [Header `<gint/drivers.h>`](https://github.com/ClasspadDev/gint/blob/dev/include/gint/drivers.h)

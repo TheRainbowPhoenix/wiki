@@ -3,6 +3,10 @@ title: "Driver: iokbd"
 description: "I/O ports-driven keyboard scanner"
 ---
 
+:::note[Unofficial documentation]
+Community-written docs, valid for the ClassPad port only, possibly slightly outdated. They will be replaced by the official gint documentation once it is published.
+:::
+
 
 This is for SH3 only. It reads key presses from ports A/B/M.
 
@@ -13,3 +17,7 @@ This is for SH3 only. It reads key presses from ports A/B/M.
 ```c
 void iokbd_scan(uint8_t *scan)
 ```
+
+## Source
+
+- [Header `<gint/drivers/iokbd.h>`](https://github.com/ClasspadDev/gint/blob/dev/include/gint/drivers/iokbd.h)

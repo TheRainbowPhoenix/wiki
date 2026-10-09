@@ -3,6 +3,10 @@ title: "Timer"
 description: "Timer operation"
 ---
 
+:::note[Unofficial documentation]
+Community-written docs, valid for the ClassPad port only, possibly slightly outdated. They will be replaced by the official gint documentation once it is published.
+:::
+
 ## Functions
 
 ### `timer_configure`
@@ -208,24 +212,50 @@ Makes sure an argument is always provided, for va_arg()
 Type of callback functions; a primitive predecessor to GINT_CALL()
 
 ```c
-typedef union { /* No argument, returns either TIMER_CONTINUE or TIMER_STOP */ int (*v)(void); /* Single integer argument */ int (*i)(int); /* Single pointer argument, cv-qualified as needed */ int (*pv) (void *); int (*pVv) (volatile void *); int (*pCv) (const void *); int (*pCVv)(volatile const void *); /* Integer pointer argument, cv-qualified as needed */ int (*pi) (int *); int (*pVi) (volatile int *); int (*pCi) (const int *); int (*pCVi)(volatile const int *); } GTRANSPARENT timer_callback_t
+typedef union
+{
+  /* No argument, returns either TIMER_CONTINUE or TIMER_STOP */ int (*v)(void);
+  /* Single integer argument */ int (*i)(int);
+  /* Single pointer argument, cv-qualified as needed */ int (*pv) (void *);
+  int (*pVv) (volatile void *);
+  int (*pCv) (const void *);
+  int (*pCVv)(volatile const void *);
+  /* Integer pointer argument, cv-qualified as needed */ int (*pi) (int *);
+  int (*pVi) (volatile int *);
+  int (*pCi) (const int *);
+  int (*pCVi)(volatile const int *);
+}
+GTRANSPARENT timer_callback_t
 ```
 
 ## Data structures
 
 ```c
-enum { TIMER_Pphi_4 = 0x00, TIMER_Pphi_16 = 0x10, TIMER_Pphi_64 = 0x20, TIMER_Pphi_256 = 0x30, }
+enum
+{
+  TIMER_Pphi_4 = 0x00, TIMER_Pphi_16 = 0x10, TIMER_Pphi_64 = 0x20, TIMER_Pphi_256 = 0x30,
+}
 ```
 
 Timer selection; see timer_configure()
 
 ```c
-enum { TIMER_ANY = -1, TIMER_TMU = -2, TIMER_ETMU = -3, }
+enum
+{
+  TIMER_ANY = -1, TIMER_TMU = -2, TIMER_ETMU = -3,
+}
 ```
 
 Return value for timer callbacks, indicating whether the timer should
 continue running and fire again, or stop now
 
 ```c
-enum { TIMER_CONTINUE = 0, TIMER_STOP = 1, }
+enum
+{
+  TIMER_CONTINUE = 0, TIMER_STOP = 1,
+}
 ```
+
+## Source
+
+- [Header `<gint/timer.h>`](https://github.com/ClasspadDev/gint/blob/dev/include/gint/timer.h)

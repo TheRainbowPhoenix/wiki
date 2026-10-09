@@ -3,6 +3,10 @@ title: "CPU"
 description: "CPU registers and built-in functions"
 ---
 
+:::note[Unofficial documentation]
+Community-written docs, valid for the ClassPad port only, possibly slightly outdated. They will be replaced by the official gint documentation once it is published.
+:::
+
 ## Functions
 
 ### `cpu_atomic_start`
@@ -177,7 +181,22 @@ void cpu_configure_VBR(uint32_t VBR)
 cpu_str_t: Bits of the Status Register
 
 ```c
-typedef lword_union(cpu_sr_t, uint32_t :1; uint32_t MD :1; uint32_t RB :1; uint32_t BL :1; uint32_t RC :12; uint32_t :3; uint32_t DSP :1; uint32_t DMY :1; uint32_t DMX :1; uint32_t M :1; uint32_t Q :1; uint32_t IMASK :4; uint32_t RF :2; uint32_t S :1; uint32_t T :1; )
+typedef lword_union(cpu_sr_t, uint32_t :1;
+uint32_t MD :1;
+uint32_t RB :1;
+uint32_t BL :1;
+uint32_t RC :12;
+uint32_t :3;
+uint32_t DSP :1;
+uint32_t DMY :1;
+uint32_t DMX :1;
+uint32_t M :1;
+uint32_t Q :1;
+uint32_t IMASK :4;
+uint32_t RF :2;
+uint32_t S :1;
+uint32_t T :1;
+)
 ```
 
 cpu_csleep_t: A cancellable sleep function
@@ -189,3 +208,7 @@ is not executable!
 ```c
 typedef GALIGNED(4) uint8_t cpu_csleep_t[20]
 ```
+
+## Source
+
+- [Header `<gint/cpu.h>`](https://github.com/ClasspadDev/gint/blob/dev/include/gint/cpu.h)

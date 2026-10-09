@@ -3,6 +3,10 @@ title: "Keyboard"
 description: "Keyboard input"
 ---
 
+:::note[Unofficial documentation]
+Community-written docs, valid for the ClassPad port only, possibly slightly outdated. They will be replaced by the official gint documentation once it is published.
+:::
+
 ## Functions
 
 ### `keysc_scan_frequency`
@@ -305,7 +309,33 @@ is preserved for compatibility until gint 3.
 ## Types
 
 ```c
-typedef struct { /* Time of event, unique over short periods */ u16 time; uint :2; /* Reserved for future use */ uint mod :1; /* Whether modifiers are used */ uint shift :1; /* If mod=1, whether SHIFT was pressed */ uint alpha :1; /* If mod=1, whether ALPHA was pressed */ uint type :3; /* Type of key event */ /* Key that was pressed or released. */ u8 key; // The following attributes will be union'd with touch info on the CP. union { struct { /* Matrix code: physical location of the key being it. */ u8 row; u8 col; }; struct { /* X/Y touch-screen coordinate */ u16 x; u16 y; }; }; } GPACKED(4) key_event_t
+typedef struct
+{
+  /* Time of event, unique over short periods */ u16 time;
+  uint :2;
+  /* Reserved for future use */ uint mod :1;
+  /* Whether modifiers are used */ uint shift :1;
+  /* If mod=1, whether SHIFT was pressed */ uint alpha :1;
+  /* If mod=1, whether ALPHA was pressed */ uint type :3;
+  /* Type of key event */ /* Key that was pressed or released. */ u8 key;
+  // The following attributes will be union'd with touch info on the CP. union
+  {
+    struct
+    {
+      /* Matrix code: physical location of the key being it. */ u8 row;
+      u8 col;
+    }
+    ;
+    struct
+    {
+      /* X/Y touch-screen coordinate */ u16 x;
+      u16 y;
+    }
+    ;
+  }
+  ;
+}
+key_event_t
 ```
 
 getkey_feature_t: Custom feature function
@@ -320,11 +350,23 @@ typedef bool (*getkey_feature_t)(key_event_t event)
 Keyboard event types, as in the [type] field of key_event_t
 
 ```c
-enum { KEYEV_NONE = 0, /* No event available (poll() only) */ KEYEV_DOWN = 1, /* Key was pressed */ KEYEV_UP = 2, /* Key was released */ KEYEV_HOLD = 3, /* A key that was pressed has been held down */ KEYEV_OSMENU = 4, /* We went to the main menu and back */ KEYEV_TOUCH_DOWN = 5, /* Touch was detected */ KEYEV_TOUCH_DRAG = 6, /* A touch that was detected has been held down */ KEYEV_TOUCH_UP = 7, /* Touch was released */ }
+enum
+{
+  KEYEV_NONE = 0, /* No event available (poll() only) */ KEYEV_DOWN = 1, /* Key was pressed */ KEYEV_UP = 2, /* Key was released */ KEYEV_HOLD = 3, /* A key that was pressed has been held down */ KEYEV_OSMENU = 4, /* We went to the main menu and back */ KEYEV_TOUCH_DOWN = 5, /* Touch was detected */ KEYEV_TOUCH_DRAG = 6, /* A touch that was detected has been held down */ KEYEV_TOUCH_UP = 7, /* Touch was released */
+}
 ```
 
 The following are the option bits for getkey_opt().
 
 ```c
-enum { /* Enable modifiers keys */ GETKEY_MOD_SHIFT = 0x0001, GETKEY_MOD_ALPHA = 0x0002, /* SHIFT + OPTN (requires GETKEY_MOD_SHIFT) or LIGHT toggles backlight */ GETKEY_BACKLIGHT = 0x0004, /* MENU triggers a task switch and displays the main menu */ GETKEY_MENU = 0x0008, /* Repeat arrow keys, or even all keys */ GETKEY_REP_ARROWS = 0x0010, GETKEY_REP_ALL = 0x0020, /* Enable custom repeat profiles; see getkey_set_repeat_profile() */ GETKEY_REP_PROFILE = 0x0040, /* Enable application shortcuts; see getkey_set_feature_function() */ GETKEY_FEATURES = 0x0080, /* After coming back from the main menu, redraw the screen with dupdate */ GETKEY_MENU_DUPDATE = 0x0100, /* After coming back from the main menu, send a KEYEV_OSMENU event */ GETKEY_MENU_EVENT = 0x0200, /* Enable power off with SHIFT + AC/ON */ GETKEY_POWEROFF = 0x0400, /* No modifiers */ GETKEY_NONE = 0x0000, /* Default settings of getkey() */ GETKEY_DEFAULT = 0x05df, }
+enum
+{
+  /* Enable modifiers keys */ GETKEY_MOD_SHIFT = 0x0001, GETKEY_MOD_ALPHA = 0x0002, /* SHIFT + OPTN (requires GETKEY_MOD_SHIFT) or LIGHT toggles backlight */ GETKEY_BACKLIGHT = 0x0004, /* MENU triggers a task switch and displays the main menu */ GETKEY_MENU = 0x0008, /* Repeat arrow keys, or even all keys */ GETKEY_REP_ARROWS = 0x0010, GETKEY_REP_ALL = 0x0020, /* Enable custom repeat profiles;
+  see getkey_set_repeat_profile() */ GETKEY_REP_PROFILE = 0x0040, /* Enable application shortcuts;
+  see getkey_set_feature_function() */ GETKEY_FEATURES = 0x0080, /* After coming back from the main menu, redraw the screen with dupdate */ GETKEY_MENU_DUPDATE = 0x0100, /* After coming back from the main menu, send a KEYEV_OSMENU event */ GETKEY_MENU_EVENT = 0x0200, /* Enable power off with SHIFT + AC/ON */ GETKEY_POWEROFF = 0x0400, /* No modifiers */ GETKEY_NONE = 0x0000, /* Default settings of getkey() */ GETKEY_DEFAULT = 0x05df,
+}
 ```
+
+## Source
+
+- [Header `<gint/keyboard.h>`](https://github.com/ClasspadDev/gint/blob/dev/include/gint/keyboard.h)

@@ -3,6 +3,10 @@ title: "Defs: GINT_CALL"
 description: "Indirect calls"
 ---
 
+:::note[Unofficial documentation]
+Community-written docs, valid for the ClassPad port only, possibly slightly outdated. They will be replaced by the official gint documentation once it is published.
+:::
+
 
 The following types and functions can be used to create "indirect function
 calls": function calls that are executed several times or a long time after
@@ -217,11 +221,29 @@ called function will take the interrupt context as its first argument.
 ## Types
 
 ```c
-typedef union { /* 32-bit integers */ int i; unsigned int u; int32_t i32; uint32_t u32; /* 32-bit floating-point */ float f; /* Pointers to most common types, in all possible cv-qualifications */ POINTER(void, pv) POINTER(bool, pb) POINTER(char, pc) POINTER(unsigned char, puc) POINTER(short, ps) POINTER(unsigned short, pus) POINTER(int, pi) POINTER(unsigned int, pui) POINTER(int8_t, pi8) POINTER(uint8_t, pu8) POINTER(int16_t, pi16) POINTER(uint16_t, pu16) POINTER(int32_t, pi32) POINTER(uint32_t, pu32) POINTER(int64_t, pi64) POINTER(uint64_t, pu64) POINTER(long long int, pll) POINTER(unsigned long long int, pull) POINTER(float, pf) POINTER(double, pd) } gint_call_arg_t
+typedef union
+{
+  /* 32-bit integers */ int i;
+  unsigned int u;
+  int32_t i32;
+  uint32_t u32;
+  /* 32-bit floating-point */ float f;
+  /* Pointers to most common types, in all possible cv-qualifications */ POINTER(void, pv) POINTER(bool, pb) POINTER(char, pc) POINTER(unsigned char, puc) POINTER(short, ps) POINTER(unsigned short, pus) POINTER(int, pi) POINTER(unsigned int, pui) POINTER(int8_t, pi8) POINTER(uint8_t, pu8) POINTER(int16_t, pi16) POINTER(uint16_t, pu16) POINTER(int32_t, pi32) POINTER(uint32_t, pu32) POINTER(int64_t, pi64) POINTER(uint64_t, pu64) POINTER(long long int, pll) POINTER(unsigned long long int, pull) POINTER(float, pf) POINTER(double, pd)
+}
+gint_call_arg_t
 ```
 
 gint_call_t: Indirect call with up to 4 register arguments
 
 ```c
-typedef struct { void *function; gint_call_arg_t args[4]; } gint_call_t
+typedef struct
+{
+  void *function;
+  gint_call_arg_t args[4];
+}
+gint_call_t
 ```
+
+## Source
+
+- [Header `<gint/defs/call.h>`](https://github.com/ClasspadDev/gint/blob/dev/include/gint/defs/call.h)

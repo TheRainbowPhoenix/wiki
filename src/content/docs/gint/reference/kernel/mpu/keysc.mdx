@@ -3,6 +3,10 @@ title: "MPU: KEYSC"
 description: "Key Scan Controller"
 ---
 
+:::note[Unofficial documentation]
+Community-written docs, valid for the ClassPad port only, possibly slightly outdated. They will be replaced by the official gint documentation once it is published.
+:::
+
 ## Macros
 
 ```c
@@ -12,5 +16,22 @@ description: "Key Scan Controller"
 ## Types
 
 ```c
-typedef volatile struct { uint16_t KIUDATA[6]; uint16_t KIUCNTREG; uint16_t KIAUTOFIXREG; uint16_t KIUMODEREG; uint16_t KIUSTATEREG; uint16_t KIUINTREG; uint16_t KIUWSETREG; uint16_t KIUINTERVALREG; uint16_t KOUTPINSET; uint16_t KINPINSET; } GPACKED(4) sh7305_keysc_t
+typedef volatile struct
+{
+  uint16_t KIUDATA[6];
+  uint16_t KIUCNTREG;
+  uint16_t KIAUTOFIXREG;
+  uint16_t KIUMODEREG;
+  uint16_t KIUSTATEREG;
+  uint16_t KIUINTREG;
+  uint16_t KIUWSETREG;
+  uint16_t KIUINTERVALREG;
+  uint16_t KOUTPINSET;
+  uint16_t KINPINSET;
+}
+sh7305_keysc_t
 ```
+
+## Source
+
+- [Header `<gint/mpu/keysc.h>`](https://github.com/ClasspadDev/gint/blob/dev/include/gint/mpu/keysc.h)

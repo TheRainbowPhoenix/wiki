@@ -3,6 +3,10 @@ title: "Driver: r61523"
 description: "Reneses R61523 driver"
 ---
 
+:::note[Unofficial documentation]
+Community-written docs, valid for the ClassPad port only, possibly slightly outdated. They will be replaced by the official gint documentation once it is published.
+:::
+
 
 This driver is used to control the 16-bit color LCD of the fx-CP 400.
 
@@ -43,3 +47,7 @@ r61523_set_pixel(): Write a pixel directly to DD (slow)
 ```c
 void r61523_set_pixel(int x, int y, int color)
 ```
+
+## Source
+
+- [Header `<gint/drivers/r61523.h>`](https://github.com/ClasspadDev/gint/blob/dev/include/gint/drivers/r61523.h)

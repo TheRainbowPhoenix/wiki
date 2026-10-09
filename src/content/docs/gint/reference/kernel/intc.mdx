@@ -3,6 +3,10 @@ title: "INTC"
 description: "Interrupt Controller"
 ---
 
+:::note[Unofficial documentation]
+Community-written docs, valid for the ClassPad port only, possibly slightly outdated. They will be replaced by the official gint documentation once it is published.
+:::
+
 ## Functions
 
 ### `intc_priority`
@@ -110,5 +114,16 @@ bool intc_handler_function(int event_code, gint_call_t function)
 ## Data structures
 
 ```c
-enum { /* Timer Unit [TMU] */ INTC_TMU_TUNI0, INTC_TMU_TUNI1, INTC_TMU_TUNI2, /* Extra Timer Unit [TMU]; SH7305-only except for ETMU_TUNI0 */ INTC_ETMU_TUNI0, INTC_ETMU_TUNI1, INTC_ETMU_TUNI2, INTC_ETMU_TUNI3, INTC_ETMU_TUNI4, INTC_ETMU_TUNI5, /* DMA Controller [DMA0]; a single IPR is used for DEI0..3, and another IPR is used for DEI4..5 and DADERR together */ INTC_DMA_DEI0, INTC_DMA_DEI1, INTC_DMA_DEI2, INTC_DMA_DEI3, INTC_DMA_DEI4, INTC_DMA_DEI5, INTC_DMA_DADERR, /* Serial Communication Interface with FIFO (SCIF0) */ INTC_SCIF0, /* Real-Time Clock [RTC]; a single IPR covers all 3 interrupts */ INTC_RTC_ATI, INTC_RTC_PRI, INTC_RTC_CUI, /* SPU; interrupts from the DSPs and the SPU-bound DMA */ INTC_SPU_DSP0, INTC_SPU_DSP1, /* USB communication */ INTC_USB, /* I2C */ INTC_I2C_AL, INTC_I2C_TACK, INTC_I2C_WAIT, INTC_I2C_DTE, }
+enum
+{
+  /* Timer Unit [TMU] */ INTC_TMU_TUNI0, INTC_TMU_TUNI1, INTC_TMU_TUNI2, /* Extra Timer Unit [TMU];
+  SH7305-only except for ETMU_TUNI0 */ INTC_ETMU_TUNI0, INTC_ETMU_TUNI1, INTC_ETMU_TUNI2, INTC_ETMU_TUNI3, INTC_ETMU_TUNI4, INTC_ETMU_TUNI5, /* DMA Controller [DMA0];
+  a single IPR is used for DEI0..3, and another IPR is used for DEI4..5 and DADERR together */ INTC_DMA_DEI0, INTC_DMA_DEI1, INTC_DMA_DEI2, INTC_DMA_DEI3, INTC_DMA_DEI4, INTC_DMA_DEI5, INTC_DMA_DADERR, /* Serial Communication Interface with FIFO (SCIF0) */ INTC_SCIF0, /* Real-Time Clock [RTC];
+  a single IPR covers all 3 interrupts */ INTC_RTC_ATI, INTC_RTC_PRI, INTC_RTC_CUI, /* SPU;
+  interrupts from the DSPs and the SPU-bound DMA */ INTC_SPU_DSP0, INTC_SPU_DSP1, /* USB communication */ INTC_USB, /* I2C */ INTC_I2C_AL, INTC_I2C_TACK, INTC_I2C_WAIT, INTC_I2C_DTE,
+}
 ```
+
+## Source
+
+- [Header `<gint/intc.h>`](https://github.com/ClasspadDev/gint/blob/dev/include/gint/intc.h)

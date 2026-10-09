@@ -3,6 +3,10 @@ title: "RTC"
 description: "Real-Time Clock"
 ---
 
+:::note[Unofficial documentation]
+Community-written docs, valid for the ClassPad port only, possibly slightly outdated. They will be replaced by the official gint documentation once it is published.
+:::
+
 ## Functions
 
 ### `rtc_get_time`
@@ -106,7 +110,19 @@ __attribute__((deprecated("Use rtc_periodic_disable() instead"))) void rtc_stop_
 ## Types
 
 ```c
-typedef struct { uint16_t year; /* Years (exact value, e.g. 2018) */ uint8_t week_day; /* Day of week, (0=Sunday, 6=Saturday) */ uint8_t month; /* Month (0..11) */ uint8_t month_day; /* Day of month (1..31) */ uint8_t hours; /* Hour (0..23) */ uint8_t minutes; /* Minute (0..59) */ uint8_t seconds; /* Second (0..59) */ uint8_t ticks; /* 128-Hz sub-second counter (0...127) */ } rtc_time_t
+typedef struct
+{
+  uint16_t year;
+  /* Years (exact value, e.g. 2018) */ uint8_t week_day;
+  /* Day of week, (0=Sunday, 6=Saturday) */ uint8_t month;
+  /* Month (0..11) */ uint8_t month_day;
+  /* Day of month (1..31) */ uint8_t hours;
+  /* Hour (0..23) */ uint8_t minutes;
+  /* Minute (0..59) */ uint8_t seconds;
+  /* Second (0..59) */ uint8_t ticks;
+  /* 128-Hz sub-second counter (0...127) */
+}
+rtc_time_t
 ```
 
 ## Data structures
@@ -114,5 +130,12 @@ typedef struct { uint16_t year; /* Years (exact value, e.g. 2018) */ uint8_t wee
 Possible frequency settings for the RTC's interrupt
 
 ```c
-enum { RTC_500mHz = 7, RTC_1Hz = 6, RTC_2Hz = 5, RTC_4Hz = 4, RTC_16Hz = 3, RTC_64Hz = 2, RTC_256Hz = 1, RTC_NONE = 0, }
+enum
+{
+  RTC_500mHz = 7, RTC_1Hz = 6, RTC_2Hz = 5, RTC_4Hz = 4, RTC_16Hz = 3, RTC_64Hz = 2, RTC_256Hz = 1, RTC_NONE = 0,
+}
 ```
+
+## Source
+
+- [Header `<gint/rtc.h>`](https://github.com/ClasspadDev/gint/blob/dev/include/gint/rtc.h)

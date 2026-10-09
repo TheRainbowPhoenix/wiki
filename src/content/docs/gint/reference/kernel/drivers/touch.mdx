@@ -3,6 +3,10 @@ title: "Driver: touch"
 description: "Internals of the touch driver"
 ---
 
+:::note[Unofficial documentation]
+Community-written docs, valid for the ClassPad port only, possibly slightly outdated. They will be replaced by the official gint documentation once it is published.
+:::
+
 ## Functions
 
 ### `touch_scan`
@@ -28,17 +32,38 @@ void touch_get_last_scan(struct _touch_adraw *raw, struct _touch_adconv *conv, s
 ## Data structures
 
 ```c
-struct _touch_adraw { /* Response to command 0x84 */ u16 x1, y1, z1, gh; u16 x2, y2, z2, dm; /* Whether data is present (if false, everything is 0 and no touches) */ bool has_data; }
+struct _touch_adraw
+{
+  /* Response to command 0x84 */ u16 x1, y1, z1, gh;
+  u16 x2, y2, z2, dm;
+  /* Whether data is present (if false, everything is 0 and no touches) */ bool has_data;
+}
 ```
 
 Second stage: decoded form of command 0x84 output.
 
 ```c
-struct _touch_adconv { /* Number of touches (0, 1 or 2) */ int touches; int x1, y1; int x2, y2; int z1, z2; u16 gh, dm; }
+struct _touch_adconv
+{
+  /* Number of touches (0, 1 or 2) */ int touches;
+  int x1, y1;
+  int x2, y2;
+  int z1, z2;
+  u16 gh, dm;
+}
 ```
 
 Third stage: screen-space dots information.
 
 ```c
-struct _touch_addots { /* Number of touches (0, 1 or 2) */ int touches; /* Valid if touches >= 1 */ int x1, y1, z1; /* Valid if touches >= 2 */ int x2, y2, z2; }
+struct _touch_addots
+{
+  /* Number of touches (0, 1 or 2) */ int touches;
+  /* Valid if touches >= 1 */ int x1, y1, z1;
+  /* Valid if touches >= 2 */ int x2, y2, z2;
+}
 ```
+
+## Source
+
+- [Header `<gint/drivers/touch.h>`](https://github.com/ClasspadDev/gint/blob/dev/include/gint/drivers/touch.h)

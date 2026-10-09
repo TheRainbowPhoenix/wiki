@@ -3,6 +3,10 @@ title: "MPU: I2C"
 description: "Reference for `<gint/mpu/i2c.h>`"
 ---
 
+:::note[Unofficial documentation]
+Community-written docs, valid for the ClassPad port only, possibly slightly outdated. They will be replaced by the official gint documentation once it is published.
+:::
+
 ## Macros
 
 ```c
@@ -13,5 +17,47 @@ description: "Reference for `<gint/mpu/i2c.h>`"
 ## Types
 
 ```c
-typedef struct { // read/write register uint8_t ICDR; pad(3); // control register byte_union(ICCR, uint8_t ICE :1; uint8_t RACK :1; uint8_t :1; uint8_t TRS :1; uint8_t :1; uint8_t BBSY :1; uint8_t :1; uint8_t SCP :1; ); pad(3); // status register byte_union(ICSR, uint8_t SCLM :1; uint8_t SDAM :1; uint8_t :1; uint8_t BUSY :1; uint8_t AL :1; uint8_t TACK :1; uint8_t WAIT :1; uint8_t DTE :1; ); pad(3); // interrupt control register byte_union(ICIC, uint8_t :1; uint8_t :1; uint8_t :1; uint8_t :1; uint8_t ALE :1; uint8_t TACKE :1; uint8_t WAITE :1; uint8_t DTEE :1; ); pad(3); // clock control registers uint8_t ICCL; pad(3); uint8_t ICCH; } GPACKED(1) sh7305_i2c_t
+typedef struct
+{
+  // read/write register uint8_t ICDR;
+  pad(3);
+  // control register byte_union(ICCR, uint8_t ICE :1;
+  uint8_t RACK :1;
+  uint8_t :1;
+  uint8_t TRS :1;
+  uint8_t :1;
+  uint8_t BBSY :1;
+  uint8_t :1;
+  uint8_t SCP :1;
+  );
+  pad(3);
+  // status register byte_union(ICSR, uint8_t SCLM :1;
+  uint8_t SDAM :1;
+  uint8_t :1;
+  uint8_t BUSY :1;
+  uint8_t AL :1;
+  uint8_t TACK :1;
+  uint8_t WAIT :1;
+  uint8_t DTE :1;
+  );
+  pad(3);
+  // interrupt control register byte_union(ICIC, uint8_t :1;
+  uint8_t :1;
+  uint8_t :1;
+  uint8_t :1;
+  uint8_t ALE :1;
+  uint8_t TACKE :1;
+  uint8_t WAITE :1;
+  uint8_t DTEE :1;
+  );
+  pad(3);
+  // clock control registers uint8_t ICCL;
+  pad(3);
+  uint8_t ICCH;
+}
+sh7305_i2c_t
 ```
+
+## Source
+
+- [Header `<gint/mpu/i2c.h>`](https://github.com/ClasspadDev/gint/blob/dev/include/gint/mpu/i2c.h)

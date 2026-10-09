@@ -3,6 +3,10 @@ title: "USB"
 description: "USB communication"
 ---
 
+:::note[Unofficial documentation]
+Community-written docs, valid for the ClassPad port only, possibly slightly outdated. They will be replaced by the official gint documentation once it is published.
+:::
+
 ## Functions
 
 ### `usb_open`
@@ -461,31 +465,86 @@ typedef struct usb_interface_endpoint usb_interface_endpoint_t
 Standard DEVICE descriptor
 
 ```c
-typedef struct { uint8_t bLength; /* = 18 */ uint8_t bDescriptorType; /* = USB_DC_DEVICE */ uint16_t bcdUSB; uint8_t bDeviceClass; uint8_t bDeviceSubClass; uint8_t bDeviceProtocol; uint8_t bMaxPacketSize0; uint16_t idVendor; uint16_t idProduct; uint16_t bcdDevice; uint8_t iManufacturer; uint8_t iProduct; uint8_t iSerialNumber; uint8_t bNumConfigurations; } GPACKED(2) usb_dc_device_t
+typedef struct
+{
+  uint8_t bLength;
+  /* = 18 */ uint8_t bDescriptorType;
+  /* = USB_DC_DEVICE */ uint16_t bcdUSB;
+  uint8_t bDeviceClass;
+  uint8_t bDeviceSubClass;
+  uint8_t bDeviceProtocol;
+  uint8_t bMaxPacketSize0;
+  uint16_t idVendor;
+  uint16_t idProduct;
+  uint16_t bcdDevice;
+  uint8_t iManufacturer;
+  uint8_t iProduct;
+  uint8_t iSerialNumber;
+  uint8_t bNumConfigurations;
+}
+usb_dc_device_t
 ```
 
 Standard CONFIGURATION descriptor
 
 ```c
-typedef struct { uint8_t bLength; /* = 9 */ uint8_t bDescriptorType; /* = USB_DC_CONFIG */ uint16_t wTotalLength; uint8_t bNumInterfaces; uint8_t bConfigurationValue; uint8_t iConfiguration; uint8_t bmAttributes; uint8_t bMaxPower; } GPACKED(1) usb_dc_configuration_t
+typedef struct
+{
+  uint8_t bLength;
+  /* = 9 */ uint8_t bDescriptorType;
+  /* = USB_DC_CONFIG */ uint16_t wTotalLength;
+  uint8_t bNumInterfaces;
+  uint8_t bConfigurationValue;
+  uint8_t iConfiguration;
+  uint8_t bmAttributes;
+  uint8_t bMaxPower;
+}
+usb_dc_configuration_t
 ```
 
 Standard INTERFACE descriptor
 
 ```c
-typedef struct { uint8_t bLength; /* = 9 */ uint8_t bDescriptorType; /* = USB_DC_INTERFACE */ uint8_t bInterfaceNumber; uint8_t bAlternateSetting; uint8_t bNumEndpoints; uint8_t bInterfaceClass; uint8_t bInterfaceSubClass; uint8_t bInterfaceProtocol; uint8_t iInterface; } GPACKED(1) usb_dc_interface_t
+typedef struct
+{
+  uint8_t bLength;
+  /* = 9 */ uint8_t bDescriptorType;
+  /* = USB_DC_INTERFACE */ uint8_t bInterfaceNumber;
+  uint8_t bAlternateSetting;
+  uint8_t bNumEndpoints;
+  uint8_t bInterfaceClass;
+  uint8_t bInterfaceSubClass;
+  uint8_t bInterfaceProtocol;
+  uint8_t iInterface;
+}
+usb_dc_interface_t
 ```
 
 Standard ENDPOINT descriptor
 
 ```c
-typedef struct { uint8_t bLength; /* = 7 */ uint8_t bDescriptorType; /* = USB_DC_ENDPOINT */ uint8_t bEndpointAddress; uint8_t bmAttributes; uint16_t wMaxPacketSize; uint8_t bInterval; } GPACKED(1) usb_dc_endpoint_t
+typedef struct
+{
+  uint8_t bLength;
+  /* = 7 */ uint8_t bDescriptorType;
+  /* = USB_DC_ENDPOINT */ uint8_t bEndpointAddress;
+  uint8_t bmAttributes;
+  uint16_t wMaxPacketSize;
+  uint8_t bInterval;
+}
+usb_dc_endpoint_t
 ```
 
 Standard STRING descriptor
 
 ```c
-typedef struct { uint8_t bLength; uint8_t bDescriptorType; /* = USB_DC_STRING */ uint16_t data[]; } GPACKED(2) usb_dc_string_t
+typedef struct
+{
+  uint8_t bLength;
+  uint8_t bDescriptorType;
+  /* = USB_DC_STRING */ uint16_t data[];
+}
+usb_dc_string_t
 ```
 
 ## Data structures
@@ -493,7 +552,10 @@ typedef struct { uint8_t bLength; uint8_t bDescriptorType; /* = USB_DC_STRING */
 Error codes for USB functions
 
 ```c
-enum { /* There are no interfaces */ USB_OPEN_NO_INTERFACE = 1, /* There are more interfaces than supported (16) */ USB_OPEN_TOO_MANY_INTERFACES = -2, /* There are not enough endpoint numbers for every interface, or there are not enough pipes to set them up */ USB_OPEN_TOO_MANY_ENDPOINTS = -3, /* There is not enough FIFO memory to use the requested buffer sizes */ USB_OPEN_NOT_ENOUGH_MEMORY = -4, /* Information is missing, such as buffer size for some endpoints */ USB_OPEN_MISSING_DATA = -5, /* Invalid parameters: bad endpoint numbers, bad buffer sizes... */ USB_OPEN_INVALID_PARAMS = -6, /* USB interfaces are already opened */ USB_OPEN_ALREADY_OPEN = -7, /* General timeout for a sync_timeout call */ USB_TIMEOUT = -8, /* This pipe is busy with another call */ USB_BUSY = -9, /* Both FIFO controllers are busy, none is available to transfer */ USB_WRITE_NOFIFO = -10, /* This pipe has no ongoing transfer to commit */ USB_COMMIT_INACTIVE = -11, /* This pipe is currently not receiving any data */ USB_READ_IDLE = -12, /* No FIFO controller is available */ USB_READ_NOFIFO = -13, /* (Internal codes) */ USB_ERROR_ZERO_LENGTH = -100, }
+enum
+{
+  /* There are no interfaces */ USB_OPEN_NO_INTERFACE = 1, /* There are more interfaces than supported (16) */ USB_OPEN_TOO_MANY_INTERFACES = -2, /* There are not enough endpoint numbers for every interface, or there are not enough pipes to set them up */ USB_OPEN_TOO_MANY_ENDPOINTS = -3, /* There is not enough FIFO memory to use the requested buffer sizes */ USB_OPEN_NOT_ENOUGH_MEMORY = -4, /* Information is missing, such as buffer size for some endpoints */ USB_OPEN_MISSING_DATA = -5, /* Invalid parameters: bad endpoint numbers, bad buffer sizes... */ USB_OPEN_INVALID_PARAMS = -6, /* USB interfaces are already opened */ USB_OPEN_ALREADY_OPEN = -7, /* General timeout for a sync_timeout call */ USB_TIMEOUT = -8, /* This pipe is busy with another call */ USB_BUSY = -9, /* Both FIFO controllers are busy, none is available to transfer */ USB_WRITE_NOFIFO = -10, /* This pipe has no ongoing transfer to commit */ USB_COMMIT_INACTIVE = -11, /* This pipe is currently not receiving any data */ USB_READ_IDLE = -12, /* No FIFO controller is available */ USB_READ_NOFIFO = -13, /* (Internal codes) */ USB_ERROR_ZERO_LENGTH = -100,
+}
 ```
 
 usb_interface_t: A USB interface that can be enabled in usb_open()
@@ -510,7 +572,13 @@ driver will use them to communicate with the interface, and transparently
 use concrete endpoint numbers internally.
 
 ```c
-struct usb_interface { /* NULL-terminated array of descriptors for the interface */ void const **dc; /* Array of endpoint parameters, see below */ struct usb_interface_endpoint *params; /* Answer class-specific SETUP requests */ /* TODO */ /* Notification that an endpoint has data to be read. This function is called frequently when data is being transmitted; the particular timings depend on low-level details. The notification should be passed down to cause the main thread to read later. Do not read in the notification function! */ void (*notify_read)(int endpoint); }
+struct usb_interface
+{
+  /* NULL-terminated array of descriptors for the interface */ void const **dc;
+  /* Array of endpoint parameters, see below */ struct usb_interface_endpoint *params;
+  /* Answer class-specific SETUP requests */ /* TODO */ /* Notification that an endpoint has data to be read. This function is called frequently when data is being transmitted;
+  the particular timings depend on low-level details. The notification should be passed down to cause the main thread to read later. Do not read in the notification function! */ void (*notify_read)(int endpoint);
+}
 ```
 
 usb_interface_endpoint_t: Parameters for an interface endpoint
@@ -520,17 +588,31 @@ endpoint. There 10 pipes, but not all can be used with any transfer type,
 and not all have access to the same amount of memory.
 
 ```c
-struct usb_interface_endpoint { /* Endpoint number as specified in the interface's descriptors (including the IN/OUT bit) */ uint8_t endpoint; /* Requested buffer size, should be a multiple of 64 and not more than 2048. Valid only for bulk and isochronous endpoints. */ uint16_t buffer_size; }
+struct usb_interface_endpoint
+{
+  /* Endpoint number as specified in the interface's descriptors (including the IN/OUT bit) */ uint8_t endpoint;
+  /* Requested buffer size, should be a multiple of 64 and not more than 2048. Valid only for bulk and isochronous endpoints. */ uint16_t buffer_size;
+}
 ```
 
 Flags for usb_read_async(), see below.
 
 ```c
-enum { /* Use the DMA for data transfer (requires full 4-byte alignment). */ USB_READ_USE_DMA = 0x01, /* Ignore reads of 0 bytes from exhausted transactions. */ USB_READ_IGNORE_ZEROS = 0x02, /* Close transactions when exhausted even by non-partial reads. */ USB_READ_AUTOCLOSE = 0x04, /* Wait for the read to finish before returning. */ USB_READ_WAIT = 0x08, /* Block for a new transaction if none is currenty active. */ USB_READ_BLOCK = 0x10, }
+enum
+{
+  /* Use the DMA for data transfer (requires full 4-byte alignment). */ USB_READ_USE_DMA = 0x01, /* Ignore reads of 0 bytes from exhausted transactions. */ USB_READ_IGNORE_ZEROS = 0x02, /* Close transactions when exhausted even by non-partial reads. */ USB_READ_AUTOCLOSE = 0x04, /* Wait for the read to finish before returning. */ USB_READ_WAIT = 0x08, /* Block for a new transaction if none is currenty active. */ USB_READ_BLOCK = 0x10,
+}
 ```
 
 Descriptor types
 
 ```c
-enum { USB_DC_DEVICE = 1, USB_DC_CONFIGURATION = 2, USB_DC_STRING = 3, USB_DC_INTERFACE = 4, USB_DC_ENDPOINT = 5, USB_DC_DEVICE_QUALIFIER = 6, USB_DC_OTHER_SPEED_CONFIGURATION = 7, USB_DC_INTERFACE_POWER = 8, }
+enum
+{
+  USB_DC_DEVICE = 1, USB_DC_CONFIGURATION = 2, USB_DC_STRING = 3, USB_DC_INTERFACE = 4, USB_DC_ENDPOINT = 5, USB_DC_DEVICE_QUALIFIER = 6, USB_DC_OTHER_SPEED_CONFIGURATION = 7, USB_DC_INTERFACE_POWER = 8,
+}
 ```
+
+## Source
+
+- [Header `<gint/usb.h>`](https://github.com/ClasspadDev/gint/blob/dev/include/gint/usb.h)

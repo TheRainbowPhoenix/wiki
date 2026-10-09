@@ -3,6 +3,10 @@ title: "UBC"
 description: "User Break Controller driver"
 ---
 
+:::note[Unofficial documentation]
+Community-written docs, valid for the ClassPad port only, possibly slightly outdated. They will be replaced by the official gint documentation once it is published.
+:::
+
 ## Functions
 
 ### `ubc_setDBR`
@@ -95,5 +99,13 @@ bool ubc_disable_channel(int channel)
 UBC Breakpoint types
 
 ```c
-typedef enum { UBC_BREAK_BEFORE, /* Break before the instruction is executed */ UBC_BREAK_AFTER, /* Break after the instruction is executed : at this point PC will point to the next instruction. */ } ubc_break_mode_t
+typedef enum
+{
+  UBC_BREAK_BEFORE, /* Break before the instruction is executed */ UBC_BREAK_AFTER, /* Break after the instruction is executed : at this point PC will point to the next instruction. */
+}
+ubc_break_mode_t
 ```
+
+## Source
+
+- [Header `<gint/ubc.h>`](https://github.com/ClasspadDev/gint/blob/dev/include/gint/ubc.h)
