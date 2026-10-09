@@ -33,15 +33,77 @@ Go to [classpad.dev](https://classpad.dev), then run the installer command from 
 irm https://get.classpad.dev/ | iex
 ```
 
-3. Follow the installer steps.
+3. Follow the installer steps below.
 
 Not on Windows or having issues? [Join our Discord server](https://discord.gg/knpcNJTzpd) for help.
+
+## Installer steps
+
+### 1. Start the update
+
+Click `Update to HollyHock V3`.
+
+![Click Update to HollyHock V3](/wiki/img/install/v3/step1.png)
+
+### 2. Download the updater
+
+Wait while the installer downloads and prepares the updater. When the `Continue` button is ready, click it.
+
+![Wait for the updater to download](/wiki/img/install/v3/step2.png)
+
+### 3. Plug in the calculator
+
+Plug your calculator into your computer with USB. If the calculator asks you to pick a USB connection mode, do not choose one. Click `Cancel` on the calculator popup, then click `Continue` in the installer.
+
+![Plug in your calculator](/wiki/img/install/v3/step3.png)
+
+### 4. Prepare the calculator
+
+Power off the calculator, then hold `EXP`, `^`, and `Clear`.
+
+While holding these three keys, press the reset button on the back of the calculator for a moment. Keep holding `EXP`, `^`, and `Clear` until the calculator shows `OS ERROR`.
+
+If you cannot get the key combo to work, watch this video guide:
+
+<div style="padding:75% 0 0 0;position:relative;">
+  <iframe src="https://player.vimeo.com/video/1234382972?title=0&amp;byline=0&amp;portrait=0&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" referrerpolicy="strict-origin-when-cross-origin" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="HollyHock V3 key combo guide"></iframe>
+</div>
+<script src="https://player.vimeo.com/api/player.js"></script>
+
+When `OS ERROR` is shown on the calculator, click `Launch the Update`.
+
+![Prepare the calculator for update mode](/wiki/img/install/v3/step4.png)
+
+### 5. Confirm the updater
+
+The official updater window will open. It repeats the same connection and key combo steps. When your calculator shows `OS ERROR`, click `OK`.
+
+The update usually takes about 10 minutes. Do not unplug the calculator while it is updating.
+
+![Confirm the updater instructions](/wiki/img/install/v3/step5.png)
+
+### 6. Finish
+
+When the installer says your calculator is ready, click `Finish`. You can now start your calculator and check that the HollyHock Launcher is available.
+
+![Finish the installer](/wiki/img/install/v3/step6.png)
 
 ## Copy files to your calculator
 
 When the installer is done, plug your calculator back in as USB storage.
 
-Copy `run.bin` to the root of your calculator storage. Also copy any `.hh3` games and Python apps you want to run to the root of the calculator.
+First, download the HollyHock launcher file:
+
+1. Open the [first run steps](https://classpaddev.github.io/first-run/#steps).
+2. Download `run.bin`.
+3. Keep the file named `run.bin`.
+
+Then transfer the files to your ClassPad II:
+
+1. Connect your ClassPad II to your computer with USB.
+2. Copy `run.bin` to the root directory of your calculator storage.
+3. Copy any `.hh3` programs, games, and Python apps you want to run to the root directory too.
+4. Safely eject your calculator from your computer.
 
 ## Launch HollyHock
 
@@ -65,3 +127,17 @@ The launcher is a bit slow, so be sure to press for a good second.
 Your app should now run.
 
 ![CPBoy running on the ClassPad](https://classpad.dev/img/step4_run.png)
+
+## Troubleshooting
+
+### Calculator freezes
+
+If your calculator freezes when launching HollyHock, check that `run.bin` was copied correctly to the root directory. Try downloading `run.bin` again and copying it one more time.
+
+### Nothing displays in the launcher
+
+If no programs appear in the launcher, check that you copied `.hh3` programs or games to the root directory of your calculator. The launcher needs these files to show options.
+
+### File transfer issues
+
+If you have trouble transferring files, make sure your calculator is properly connected and recognized by your computer. Try using a different USB cable if needed.
