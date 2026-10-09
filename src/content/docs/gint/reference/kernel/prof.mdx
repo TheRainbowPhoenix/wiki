@@ -3,6 +3,10 @@ title: "Profiling"
 description: "prof: A manual profiling interface for gint"
 ---
 
+:::note[Unofficial documentation]
+Community-written docs, valid for the ClassPad port only, possibly slightly outdated. They will be replaced by the official gint documentation once it is published.
+:::
+
 ## Functions
 
 ### `prof_init`
@@ -133,5 +137,14 @@ except if the function is recursive, in which case it should be either
 static or global.
 
 ```c
-typedef struct prof_t { uint32_t rec; uint32_t elapsed; } GPACKED(4) prof_t
+typedef struct prof_t
+{
+  uint32_t rec;
+  uint32_t elapsed;
+}
+prof_t
 ```
+
+## Source
+
+- [Header `<gint/prof.h>`](https://github.com/ClasspadDev/gint/blob/dev/include/gint/prof.h)

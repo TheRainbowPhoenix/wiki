@@ -3,6 +3,10 @@ title: "Filesystem"
 description: "Filesystem abstraction"
 ---
 
+:::note[Unofficial documentation]
+Community-written docs, valid for the ClassPad port only, possibly slightly outdated. They will be replaced by the official gint documentation once it is published.
+:::
+
 ## Functions
 
 ### `fs_get_descriptor`
@@ -118,12 +122,28 @@ Maximum number of file descriptors
 ## Types
 
 ```c
-typedef struct { /* See <unistd.h> for a description of these functions */ ssize_t (*read)(void *data, void *buf, size_t size); ssize_t (*write)(void *data, void const *buf, size_t size); off_t (*lseek)(void *data, off_t offset, int whence); int (*close)(void *data); } fs_descriptor_type_t
+typedef struct
+{
+  /* See <unistd.h> for a description of these functions */ ssize_t (*read)(void *data, void *buf, size_t size);
+  ssize_t (*write)(void *data, void const *buf, size_t size);
+  off_t (*lseek)(void *data, off_t offset, int whence);
+  int (*close)(void *data);
+}
+fs_descriptor_type_t
 ```
 
 fs_descriptor_t: File descriptor information
 This internal type describes the entries of the descriptor table.
 
 ```c
-typedef struct { /* Interface functions */ fs_descriptor_type_t const *type; /* Custom data (can also be an integer cast to (void *)) */ void *data; } fs_descriptor_t
+typedef struct
+{
+  /* Interface functions */ fs_descriptor_type_t const *type;
+  /* Custom data (can also be an integer cast to (void *)) */ void *data;
+}
+fs_descriptor_t
 ```
+
+## Source
+
+- [Header `<gint/fs.h>`](https://github.com/ClasspadDev/gint/blob/dev/include/gint/fs.h)

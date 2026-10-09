@@ -3,6 +3,10 @@ title: "gint"
 description: "gint - An alternative runtime environment for fx9860g and fxcg50"
 ---
 
+:::note[Unofficial documentation]
+Community-written docs, valid for the ClassPad port only, possibly slightly outdated. They will be replaced by the official gint documentation once it is published.
+:::
+
 ## Functions
 
 ### `gint_world_switch`
@@ -206,7 +210,14 @@ gint_inth_callback_context_t: Context of the interrupted function when an
 interrupt is handled by gint_inth_callback.
 
 ```c
-typedef struct { uint32_t mach, macl, gbr; uint32_t sr; uint32_t pc; uint32_t r[8]; } gint_inth_callback_context_t
+typedef struct
+{
+  uint32_t mach, macl, gbr;
+  uint32_t sr;
+  uint32_t pc;
+  uint32_t r[8];
+}
+gint_inth_callback_context_t
 ```
 
 ## Data structures
@@ -243,5 +254,12 @@ saving method. This allows application-specific compromises.
 This is not a problem on SH3 because on-chip memory is only used on SH4.
 
 ```c
-enum { GINT_ONCHIP_REINITIALIZE = 0, GINT_ONCHIP_BACKUP = 1, GINT_ONCHIP_NOTHING = 2, }
+enum
+{
+  GINT_ONCHIP_REINITIALIZE = 0, GINT_ONCHIP_BACKUP = 1, GINT_ONCHIP_NOTHING = 2,
+}
 ```
+
+## Source
+
+- [Header `<gint/gint.h>`](https://github.com/ClasspadDev/gint/blob/dev/include/gint/gint.h)

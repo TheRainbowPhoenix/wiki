@@ -3,6 +3,10 @@ title: "Video"
 description: "Generic video interface"
 ---
 
+:::note[Unofficial documentation]
+Community-written docs, valid for the ClassPad port only, possibly slightly outdated. They will be replaced by the official gint documentation once it is published.
+:::
+
 
 This header defines the interface for video (display) drivers. It allows
 high-level code to manipulate the display independently of the underlying
@@ -83,11 +87,34 @@ Flags for the update function of the interface.
 ## Types
 
 ```c
-typedef struct { /* Mode size */ uint16_t width; uint16_t height; /* Pixel format */ int16_t format; /* Refresh frequency, -1 if unknown */ int16_t freq; } video_mode_t
+typedef struct
+{
+  /* Mode size */ uint16_t width;
+  uint16_t height;
+  /* Pixel format */ int16_t format;
+  /* Refresh frequency, -1 if unknown */ int16_t freq;
+}
+video_mode_t
 ```
 
 Video driver interface.
 
 ```c
-typedef struct { /* Associated driver (NULL if there's none). */ gint_driver_t const *driver; /* List of modes (terminated by an all-0 element). The first mode is the default mode and it should always be available. */ video_mode_t const *modes; /* Get current video mode. */ uint (*mode_get)(void); /* Set a video mode. */ bool (*mode_set)(uint id); /* Minimum and maximum brightness settings. */ int brightness_min; int brightness_max; /* Set a brightness setting. */ bool (*brightness_set)(int setting); /* Implements video_update(); bounds are checked befoer calling. */ bool (*update)(int x, int y, image_t const *framebuffer, int flags); } video_interface_t
+typedef struct
+{
+  /* Associated driver (NULL if there's none). */ gint_driver_t const *driver;
+  /* List of modes (terminated by an all-0 element). The first mode is the default mode and it should always be available. */ video_mode_t const *modes;
+  /* Get current video mode. */ uint (*mode_get)(void);
+  /* Set a video mode. */ bool (*mode_set)(uint id);
+  /* Minimum and maximum brightness settings. */ int brightness_min;
+  int brightness_max;
+  /* Set a brightness setting. */ bool (*brightness_set)(int setting);
+  /* Implements video_update();
+  bounds are checked befoer calling. */ bool (*update)(int x, int y, image_t const *framebuffer, int flags);
+}
+video_interface_t
 ```
+
+## Source
+
+- [Header `<gint/video.h>`](https://github.com/ClasspadDev/gint/blob/dev/include/gint/video.h)

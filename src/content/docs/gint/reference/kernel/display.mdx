@@ -3,6 +3,10 @@ title: "Display"
 description: "Drawing functions"
 ---
 
+:::note[Unofficial documentation]
+Community-written docs, valid for the ClassPad port only, possibly slightly outdated. They will be replaced by the official gint documentation once it is published.
+:::
+
 
 This module covers the drawing functions that are common to fx9860g and
 fxcg50. Platform-specific definitions are found in \<gint/display-fx.h>
@@ -529,7 +533,47 @@ void dsubimage(int x, int y, bopti_image_t const *image, int left, int top, int 
 font_t: Font data encoded for topti
 
 ```c
-typedef struct { /* Font name (NUL-terminated), NULL if no title */ char const *name; /* Font shape flags */ uint bold :1; uint italic :1; uint serif :1; uint mono :1; uint :3; /* Whether data is variable-length (proportional font) */ uint prop :1; /* Line height */ uint8_t line_height; /* Storage height */ uint8_t data_height; /* Number of Unicode blocks */ uint8_t block_count; /* Number of total glyphs */ uint32_t glyph_count; /* Character spacing (usually 1) */ uint8_t char_spacing; /* Distance between the y positions for two consecutive lines. This is an informative metric for text wrapping tools, not used by dtext() and other standard functions that always write a single line. */ uint8_t line_distance; uint :16; struct { /* Unicode point of first character in block */ uint start :20; /* Length of block */ uint length :12; } *blocks; /* Raw glyph data */ uint32_t *data; union { /* For monospaced fonts */ struct { /* Width of glyphs */ uint16_t width; /* Storage size, in longwords, of each glyph */ uint16_t storage_size; }; /* For proportional fonts */ struct { /* Storage index to find glyphs quickly */ uint16_t *glyph_index; /* Width of each individual glyph */ uint8_t *glyph_width; }; }; } GPACKED(4) font_t
+typedef struct
+{
+  /* Font name (NUL-terminated), NULL if no title */ char const *name;
+  /* Font shape flags */ uint bold :1;
+  uint italic :1;
+  uint serif :1;
+  uint mono :1;
+  uint :3;
+  /* Whether data is variable-length (proportional font) */ uint prop :1;
+  /* Line height */ uint8_t line_height;
+  /* Storage height */ uint8_t data_height;
+  /* Number of Unicode blocks */ uint8_t block_count;
+  /* Number of total glyphs */ uint32_t glyph_count;
+  /* Character spacing (usually 1) */ uint8_t char_spacing;
+  /* Distance between the y positions for two consecutive lines. This is an informative metric for text wrapping tools, not used by dtext() and other standard functions that always write a single line. */ uint8_t line_distance;
+  uint :16;
+  struct
+  {
+    /* Unicode point of first character in block */ uint start :20;
+    /* Length of block */ uint length :12;
+  }
+  *blocks;
+  /* Raw glyph data */ uint32_t *data;
+  union
+  {
+    /* For monospaced fonts */ struct
+    {
+      /* Width of glyphs */ uint16_t width;
+      /* Storage size, in longwords, of each glyph */ uint16_t storage_size;
+    }
+    ;
+    /* For proportional fonts */ struct
+    {
+      /* Storage index to find glyphs quickly */ uint16_t *glyph_index;
+      /* Width of each individual glyph */ uint8_t *glyph_width;
+    }
+    ;
+  }
+  ;
+}
+font_t
 ```
 
 ## Data structures
@@ -541,7 +585,11 @@ to the rectangle spanning from (left,top) included, to (right,bottom)
 excluded. The default is from (0,0) to (DWIDTH,DHEIGHT).
 
 ```c
-struct dwindow { int left, top; int right, bottom; }
+struct dwindow
+{
+  int left, top;
+  int right, bottom;
+}
 ```
 
 dwindow_set(): Set the rendering window
@@ -562,11 +610,21 @@ and a horizontal alignment option specifies where a given point (x,y) should
 be relative to the rendered string.
 
 ```c
-enum { /* Horizontal settings: default in dtext() is DTEXT_LEFT */ DTEXT_LEFT = 0, DTEXT_CENTER = 1, DTEXT_RIGHT = 2, /* Vertical settings: default in dtext() is DTEXT_TOP */ DTEXT_TOP = 0, DTEXT_MIDDLE = 1, DTEXT_BOTTOM = 2, }
+enum
+{
+  /* Horizontal settings: default in dtext() is DTEXT_LEFT */ DTEXT_LEFT = 0, DTEXT_CENTER = 1, DTEXT_RIGHT = 2, /* Vertical settings: default in dtext() is DTEXT_TOP */ DTEXT_TOP = 0, DTEXT_MIDDLE = 1, DTEXT_BOTTOM = 2,
+}
 ```
 
 Option values for dsubimage()
 
 ```c
-enum { /* No option */ DIMAGE_NONE = 0x00, /* Disable clipping, ie. adjustments to the specified subrectangle and screen location such that any part that overflows from the image or the screen is ignored. Slightly faster. */ DIMAGE_NOCLIP = 0x01, }
+enum
+{
+  /* No option */ DIMAGE_NONE = 0x00, /* Disable clipping, ie. adjustments to the specified subrectangle and screen location such that any part that overflows from the image or the screen is ignored. Slightly faster. */ DIMAGE_NOCLIP = 0x01,
+}
 ```
+
+## Source
+
+- [Header `<gint/display.h>`](https://github.com/ClasspadDev/gint/blob/dev/include/gint/display.h)

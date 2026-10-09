@@ -3,6 +3,10 @@ title: "USB: FF-Bulk"
 description: "A bulk-based transfer class using the fxlink protocol"
 ---
 
+:::note[Unofficial documentation]
+Community-written docs, valid for the ClassPad port only, possibly slightly outdated. They will be replaced by the official gint documentation once it is published.
+:::
+
 
 This interface (class code 0xff/0x77) implements a simple bidirectional
 communication channel running the fxlink protocol. It basically talks to
@@ -179,13 +183,28 @@ restriction might be lifted in the future. As with the rest of the USB
 protocol, all the integer are encoded as *little-endian*.
 
 ```c
-typedef struct usb_fxlink_header { /* Protocol version = 0x00000100 */ uint32_t version; /* Size of the data to transfer (excluding this header) */ uint32_t size; /* Size of individual transfers (related to the size of the FIFO) */ uint32_t transfer_size; /* Application name and message type, UTF-8 (need not be zero-terminated) */ char application[16]; char type[16]; } usb_fxlink_header_t
+typedef struct usb_fxlink_header
+{
+  /* Protocol version = 0x00000100 */ uint32_t version;
+  /* Size of the data to transfer (excluding this header) */ uint32_t size;
+  /* Size of individual transfers (related to the size of the FIFO) */ uint32_t transfer_size;
+  /* Application name and message type, UTF-8 (need not be zero-terminated) */ char application[16];
+  char type[16];
+}
+usb_fxlink_header_t
 ```
 
 Subheader for the fxlink built-in "image" type
 
 ```c
-typedef struct { /* Image size; storage is row-major */ uint32_t width; uint32_t height; /* Pixel format, see below */ int pixel_format; } usb_fxlink_image_t
+typedef struct
+{
+  /* Image size;
+  storage is row-major */ uint32_t width;
+  uint32_t height;
+  /* Pixel format, see below */ int pixel_format;
+}
+usb_fxlink_image_t
 ```
 
 ## Data structures
@@ -197,5 +216,12 @@ struct usb_fxlink_header
 Pixel formats
 
 ```c
-enum { /* Image is an array of *big-endian* uint16_t with RGB565 format */ USB_FXLINK_IMAGE_RGB565 = 0, /* Image is an array of bits in mono format */ USB_FXLINK_IMAGE_MONO, /* Image is two consecutive mono arrays, one for light, one for dark */ USB_FXLINK_IMAGE_GRAY, }
+enum
+{
+  /* Image is an array of *big-endian* uint16_t with RGB565 format */ USB_FXLINK_IMAGE_RGB565 = 0, /* Image is an array of bits in mono format */ USB_FXLINK_IMAGE_MONO, /* Image is two consecutive mono arrays, one for light, one for dark */ USB_FXLINK_IMAGE_GRAY,
+}
 ```
+
+## Source
+
+- [Header `<gint/usb-ff-bulk.h>`](https://github.com/ClasspadDev/gint/blob/dev/include/gint/usb-ff-bulk.h)

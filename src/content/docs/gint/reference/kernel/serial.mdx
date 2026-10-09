@@ -3,6 +3,10 @@ title: "Serial"
 description: "Serial communication"
 ---
 
+:::note[Unofficial documentation]
+Community-written docs, valid for the ClassPad port only, possibly slightly outdated. They will be replaced by the official gint documentation once it is published.
+:::
+
 ## Functions
 
 ### `serial_open`
@@ -78,9 +82,24 @@ void serial_close(void)
 TODO: This is a template for a future implementation.
 
 ```c
-typedef enum { SERIAL_PARITY_NONE, SERIAL_PARITY_EVEN, SERIAL_PARITY_ODD, } GPACKEDENUM serial_parity_t
+typedef enum
+{
+  SERIAL_PARITY_NONE, SERIAL_PARITY_EVEN, SERIAL_PARITY_ODD,
+}
+GPACKEDENUM serial_parity_t
 ```
 
 ```c
-typedef struct { /* Baud rate (valid options are 300, 600, 1200, 2400, 4800, 9600, 19200, 38400, 57600 and 115200) */ int baudrate; /* Parity */ serial_parity_t parity; /* Data width (valid options are 7 and 8) */ uint8_t data_width; /* Stop bits (valid options are 1 and 2) */ uint8_t stop_bits; } serial_config_t
+typedef struct
+{
+  /* Baud rate (valid options are 300, 600, 1200, 2400, 4800, 9600, 19200, 38400, 57600 and 115200) */ int baudrate;
+  /* Parity */ serial_parity_t parity;
+  /* Data width (valid options are 7 and 8) */ uint8_t data_width;
+  /* Stop bits (valid options are 1 and 2) */ uint8_t stop_bits;
+}
+serial_config_t
 ```
+
+## Source
+
+- [Header `<gint/serial.h>`](https://github.com/ClasspadDev/gint/blob/dev/include/gint/serial.h)

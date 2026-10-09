@@ -3,6 +3,10 @@ title: "Defs: attributes"
 description: "Macros for compiler-specific attributes"
 ---
 
+:::note[Unofficial documentation]
+Community-written docs, valid for the ClassPad port only, possibly slightly outdated. They will be replaced by the official gint documentation once it is published.
+:::
+
 ## Macros
 
 ### `GSECTION`
@@ -134,3 +138,7 @@ Functions that do not return
 #define GYRAM __attribute__((section(".xyram")))
 #define GDESTRUCTOR __attribute__((destructor))
 ```
+
+## Source
+
+- [Header `<gint/defs/attributes.h>`](https://github.com/ClasspadDev/gint/blob/dev/include/gint/defs/attributes.h)

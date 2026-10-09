@@ -3,6 +3,10 @@ title: "MPU: DMA"
 description: "Direct Memory Access control"
 ---
 
+:::note[Unofficial documentation]
+Community-written docs, valid for the ClassPad port only, possibly slightly outdated. They will be replaced by the official gint documentation once it is published.
+:::
+
 
 The DMA is a major module on fxcg50 because it is needed to send data
 to the display at a reasonable speed. On fx9860g, it is very rarely
@@ -17,11 +21,62 @@ used, if ever.
 ## Types
 
 ```c
-typedef volatile struct { uint32_t SAR; uint32_t DAR; /* Mind that the 8 upper bits should always be written as 0 */ uint32_t TCR; lword_union(CHCR, uint32_t :1; uint32_t LCKN :1; /* Bus Right Release Enable */ uint32_t :2; uint32_t RPT :3; /* Repeat setting [0..3] */ uint32_t DA :1; /* DREQ Asynchronous [0,1] */ uint32_t DO :1; /* DMA Overrun [0,1] */ uint32_t :1; uint32_t TS_32 :2; /* Transfer Size (upper half) */ uint32_t HE :1; /* Half-End flag [0..3] */ uint32_t HIE :1; /* Half-end Interrupt Enable [0..3] */ uint32_t AM :1; /* Acknowledge mode [0,1] */ uint32_t AL :1; /* Acknowledge level [0,1] */ uint32_t DM :2; /* Destination address Mode */ uint32_t SM :2; /* Source address Mode */ uint32_t RS :4; /* Resource Select [0,1] */ uint32_t DL :1; /* DREQ Level [0,1] */ uint32_t DS :1; /* DREQ Source select[0,1] */ uint32_t TB :1; /* Transfer Bus Mode */ uint32_t TS_10 :2; /* Transfer Size (lower half) */ uint32_t IE :1; /* Interrupt Enable */ uint32_t TE :1; /* Transfer End flag */ uint32_t DE :1; /* DMA Enable */ ); } GPACKED(4) sh7305_dma_channel_t
+typedef volatile struct
+{
+  uint32_t SAR;
+  uint32_t DAR;
+  /* Mind that the 8 upper bits should always be written as 0 */ uint32_t TCR;
+  lword_union(CHCR, uint32_t :1;
+  uint32_t LCKN :1;
+  /* Bus Right Release Enable */ uint32_t :2;
+  uint32_t RPT :3;
+  /* Repeat setting [0..3] */ uint32_t DA :1;
+  /* DREQ Asynchronous [0,1] */ uint32_t DO :1;
+  /* DMA Overrun [0,1] */ uint32_t :1;
+  uint32_t TS_32 :2;
+  /* Transfer Size (upper half) */ uint32_t HE :1;
+  /* Half-End flag [0..3] */ uint32_t HIE :1;
+  /* Half-end Interrupt Enable [0..3] */ uint32_t AM :1;
+  /* Acknowledge mode [0,1] */ uint32_t AL :1;
+  /* Acknowledge level [0,1] */ uint32_t DM :2;
+  /* Destination address Mode */ uint32_t SM :2;
+  /* Source address Mode */ uint32_t RS :4;
+  /* Resource Select [0,1] */ uint32_t DL :1;
+  /* DREQ Level [0,1] */ uint32_t DS :1;
+  /* DREQ Source select[0,1] */ uint32_t TB :1;
+  /* Transfer Bus Mode */ uint32_t TS_10 :2;
+  /* Transfer Size (lower half) */ uint32_t IE :1;
+  /* Interrupt Enable */ uint32_t TE :1;
+  /* Transfer End flag */ uint32_t DE :1;
+  /* DMA Enable */ );
+}
+sh7305_dma_channel_t
 ```
 
 sh7305_dma_t - DMA Controller
 
 ```c
-typedef volatile struct { sh7305_dma_channel_t DMA0; sh7305_dma_channel_t DMA1; sh7305_dma_channel_t DMA2; sh7305_dma_channel_t DMA3; word_union(OR, uint16_t CMS :4; /* Cycle steal Mode Select */ uint16_t :2; uint16_t PR :2; /* PRiority mode */ uint16_t :5; uint16_t AE :1; /* Address Error flag */ uint16_t NMIF :1; /* NMI Flag */ uint16_t DME :1; /* DMA Master Enable */ ); pad(14); sh7305_dma_channel_t DMA4; sh7305_dma_channel_t DMA5; } GPACKED(4) sh7305_dma_t
+typedef volatile struct
+{
+  sh7305_dma_channel_t DMA0;
+  sh7305_dma_channel_t DMA1;
+  sh7305_dma_channel_t DMA2;
+  sh7305_dma_channel_t DMA3;
+  word_union(OR, uint16_t CMS :4;
+  /* Cycle steal Mode Select */ uint16_t :2;
+  uint16_t PR :2;
+  /* PRiority mode */ uint16_t :5;
+  uint16_t AE :1;
+  /* Address Error flag */ uint16_t NMIF :1;
+  /* NMI Flag */ uint16_t DME :1;
+  /* DMA Master Enable */ );
+  pad(14);
+  sh7305_dma_channel_t DMA4;
+  sh7305_dma_channel_t DMA5;
+}
+sh7305_dma_t
 ```
+
+## Source
+
+- [Header `<gint/mpu/dma.h>`](https://github.com/ClasspadDev/gint/blob/dev/include/gint/mpu/dma.h)

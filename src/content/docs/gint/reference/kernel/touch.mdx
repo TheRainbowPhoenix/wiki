@@ -3,6 +3,10 @@ title: "Touch"
 description: "touch-screen driver API"
 ---
 
+:::note[Unofficial documentation]
+Community-written docs, valid for the ClassPad port only, possibly slightly outdated. They will be replaced by the official gint documentation once it is published.
+:::
+
 ## Functions
 
 ### `touch_calib_get`
@@ -43,5 +47,19 @@ extern int touch_calib_set(touch_calibration_t *calib)
 ## Types
 
 ```c
-typedef struct { int x_base; int x_div; int y_base; int y_div; int dual_debounce_frame; int dual_sensi_entry; int dual_sensi_leave; } touch_calibration_t
+typedef struct
+{
+  int x_base;
+  int x_div;
+  int y_base;
+  int y_div;
+  int dual_debounce_frame;
+  int dual_sensi_entry;
+  int dual_sensi_leave;
+}
+touch_calibration_t
 ```
+
+## Source
+
+- [Header `<gint/touch.h>`](https://github.com/ClasspadDev/gint/blob/dev/include/gint/touch.h)

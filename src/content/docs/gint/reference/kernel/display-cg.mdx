@@ -3,6 +3,10 @@ title: "Display: fx-CG 50"
 description: "fx-CG 50 rendering functions"
 ---
 
+:::note[Unofficial documentation]
+Community-written docs, valid for the ClassPad port only, possibly slightly outdated. They will be replaced by the official gint documentation once it is published.
+:::
+
 
 This module covers rendering functions specific to the fx-CG 50. In addition
 to triple-buffering management, this mainly includes image manipulation
@@ -130,5 +134,12 @@ typedef image_t bopti_image_t
 ## Data structures
 
 ```c
-enum { /* Compatibility with fx9860g color names */ C_WHITE = 0xffff, C_LIGHT = 0xad55, C_DARK = 0x528a, C_BLACK = 0x0000, /* Other colors */ C_RED = 0xf800, C_GREEN = 0x07e0, C_BLUE = 0x001f, C_NONE = -1, C_INVERT = -2, }
+enum
+{
+  /* Compatibility with fx9860g color names */ C_WHITE = 0xffff, C_LIGHT = 0xad55, C_DARK = 0x528a, C_BLACK = 0x0000, /* Other colors */ C_RED = 0xf800, C_GREEN = 0x07e0, C_BLUE = 0x001f, C_NONE = -1, C_INVERT = -2,
+}
 ```
+
+## Source
+
+- [Header `<gint/display-cg.h>`](https://github.com/ClasspadDev/gint/blob/dev/include/gint/display-cg.h)

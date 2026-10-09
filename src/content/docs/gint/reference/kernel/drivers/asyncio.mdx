@@ -3,6 +3,10 @@ title: "Driver: asyncio"
 description: "Asynchronous I/O common definitions"
 ---
 
+:::note[Unofficial documentation]
+Community-written docs, valid for the ClassPad port only, possibly slightly outdated. They will be replaced by the official gint documentation once it is published.
+:::
+
 ## Functions
 
 ### `asyncio_op_clear`
@@ -162,7 +166,29 @@ void asyncio_op_cancel_read(asyncio_op_t *op)
 ## Types
 
 ```c
-typedef volatile struct { /* Type of I/O operation (NONE/WRITE/SYNC/READ) */ uint8_t type; /* Whether the DMA should be used for hardware access */ bool dma :1; /* For reading pipes, whether the transaction is expected to continue with another hardware segment after the current one */ bool cont_r :1; /* For reading pipes, interrupt flag signaling an incoming hardware segment not yet added to the operation */ bool interrupt_r :1; /* For reading pipes, whether the current read call should close the current hardware segment if all the data is read even if the read call is not partial */ bool autoclose_r :1; /* Hardware resource being used for access (meaning depends on hardware). Usually, this is assigned for the duration of hardware transaction. This value is user-managed and not modified by asyncio_op functions. */ uint8_t controller; /* Number of bytes in short buffer (0..3) */ uint8_t shbuf_size; /* Short buffer */ uint32_t shbuf; /* Size of data currently in the hardware buffer */ int16_t buffer_used; /* Size of data being read/written in the current round (which may itself be asynchronous if it's using the DMA) */ uint16_t round_size; union { /* Address of data to transfer, incremented gradually [write] */ void const *data_w; /* Address of buffer to store data to, incremented gradually [read] */ void *data_r; }; /* Size of data left to transfer to satisfy the complete request */ int size; /* For reading operations, pointer to total amount of transferred data */ int *realized_size_r; /* Callback at the end of the current write, final commit, or read */ gint_call_t callback; } asyncio_op_t
+typedef volatile struct
+{
+  /* Type of I/O operation (NONE/WRITE/SYNC/READ) */ uint8_t type;
+  /* Whether the DMA should be used for hardware access */ bool dma :1;
+  /* For reading pipes, whether the transaction is expected to continue with another hardware segment after the current one */ bool cont_r :1;
+  /* For reading pipes, interrupt flag signaling an incoming hardware segment not yet added to the operation */ bool interrupt_r :1;
+  /* For reading pipes, whether the current read call should close the current hardware segment if all the data is read even if the read call is not partial */ bool autoclose_r :1;
+  /* Hardware resource being used for access (meaning depends on hardware). Usually, this is assigned for the duration of hardware transaction. This value is user-managed and not modified by asyncio_op functions. */ uint8_t controller;
+  /* Number of bytes in short buffer (0..3) */ uint8_t shbuf_size;
+  /* Short buffer */ uint32_t shbuf;
+  /* Size of data currently in the hardware buffer */ int16_t buffer_used;
+  /* Size of data being read/written in the current round (which may itself be asynchronous if it's using the DMA) */ uint16_t round_size;
+  union
+  {
+    /* Address of data to transfer, incremented gradually [write] */ void const *data_w;
+    /* Address of buffer to store data to, incremented gradually [read] */ void *data_r;
+  }
+  ;
+  /* Size of data left to transfer to satisfy the complete request */ int size;
+  /* For reading operations, pointer to total amount of transferred data */ int *realized_size_r;
+  /* Callback at the end of the current write, final commit, or read */ gint_call_t callback;
+}
+asyncio_op_t
 ```
 
 ## Data structures
@@ -331,9 +357,19 @@ read(2) user segments.
 States can be checked and transitioned with the API functions below.
 
 ```c
-enum { ASYNCIO_NONE, ASYNCIO_READ, ASYNCIO_WRITE, ASYNCIO_SYNC }
+enum
+{
+  ASYNCIO_NONE, ASYNCIO_READ, ASYNCIO_WRITE, ASYNCIO_SYNC
+}
 ```
 
 ```c
-enum { ASYNCIO_HWSEG_EXHAUSTED = 0x01, ASYNCIO_REQUEST_FINISHED = 0x02, ASYNCIO_TRANSACTION_EXHAUSTED = 0x04, }
+enum
+{
+  ASYNCIO_HWSEG_EXHAUSTED = 0x01, ASYNCIO_REQUEST_FINISHED = 0x02, ASYNCIO_TRANSACTION_EXHAUSTED = 0x04,
+}
 ```
+
+## Source
+
+- [Header `<gint/drivers/asyncio.h>`](https://github.com/ClasspadDev/gint/blob/dev/include/gint/drivers/asyncio.h)

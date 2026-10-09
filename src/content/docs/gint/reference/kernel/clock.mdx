@@ -3,6 +3,10 @@ title: "Clock"
 description: "Clock signals, overclock, and standby modes"
 ---
 
+:::note[Unofficial documentation]
+Community-written docs, valid for the ClassPad port only, possibly slightly outdated. They will be replaced by the official gint documentation once it is published.
+:::
+
 ## Functions
 
 ### `clock_freq`
@@ -134,7 +138,36 @@ sleep_ms(): Sleep for a fixed duration in milliseconds
 ## Types
 
 ```c
-typedef struct { union { int PLL1; int FLL; }; union { int PLL2; int PLL; }; int Bphi_div; int Iphi_div; int Pphi_div; int Sphi_div; union { int CKIO_f; int RTCCLK_f; }; int Bphi_f; int Iphi_f; int Pphi_f; int Sphi_f; } clock_frequency_t
+typedef struct
+{
+  union
+  {
+    int PLL1;
+    int FLL;
+  }
+  ;
+  union
+  {
+    int PLL2;
+    int PLL;
+  }
+  ;
+  int Bphi_div;
+  int Iphi_div;
+  int Pphi_div;
+  int Sphi_div;
+  union
+  {
+    int CKIO_f;
+    int RTCCLK_f;
+  }
+  ;
+  int Bphi_f;
+  int Iphi_f;
+  int Pphi_f;
+  int Sphi_f;
+}
+clock_frequency_t
 ```
 
 ## Data structures
@@ -144,7 +177,10 @@ gint. These are always the settings from Ftune/Ptune, which are the most
 widely tested and gint treats as the standard.
 
 ```c
-enum { /* Combinations of hardware settings that are none of Ftune's levels */ CLOCK_SPEED_UNKNOWN = 0, /* Ftune's 5 default overclock levels. The main settings are listed below, though many more are involved. On SH3 fx-9860G-like: F1: CPU @ 29 MHz [Default speed] F2: CPU @ 58 MHz [Similar to G-III default] F3: CPU @ 88 MHz F4: CPU @ 118 MHz [Fastest CPU option] F5: CPU @ 118 MHz [Reduced memory wait times] On SH4 fx-9860G-like: F1: CPU @ 29 MHz, BFC @ 29 MHz [Default speed] F2: CPU @ 58 MHz, BFC @ 29 MHz [Similar to G-III default] F3: CPU @ 29 MHz, BFC @ 29 MHz [SH3 default] F4: CPU @ 118 MHz, BFC @ 59 MHz F5: CPU @ 236 MHz, BFC @ 118 MHz [Fastest option] On G-III / Graph 35+E II: F1: CPU @ 58 MHz, BFC @ 29 MHz [Default speed] F2: CPU @ 58 MHz, BFC @ 29 MHz [fx-CG 10/20 default] F3: CPU @ 29 MHz, BFC @ 29 MHz [SH3 default] F4: CPU @ 118 MHz, BFC @ 58 MHz F5: CPU @ 235 MHz, BFC @ 58 MHz [Fastest option] On fx-CG 10/20: F1: CPU @ 58 MHz, BFC @ 29 MHz [Default speed] F2: CPU @ 58 MHz, BFC @ 29 MHz [Improved memory speed] F3: CPU @ 118 MHz, BFC @ 58 MHz [Faster than F2] F4: CPU @ 118 MHz, BFC @ 118 MHz [Fastest bus option] F5: CPU @ 191 MHz, BFC @ 94 MHz [Fastest CPU option] On fx-CG 50: F1: CPU @ 116 MHz, BFC @ 58 MHz [Default speed] F2: CPU @ 58 MHz, BFC @ 29 MHz [fx-CG 10/20 default] F3: CPU @ 94 MHz, BFC @ 47 MHz [Clearly slow: F2 < F3 < F1] F4: CPU @ 232 MHz, BFC @ 58 MHz [Fastest CPU option] F5: CPU @ 189 MHz, BFC @ 94 MHz [Fastest bus option] */ CLOCK_SPEED_F1 = 1, CLOCK_SPEED_F2 = 2, CLOCK_SPEED_F3 = 3, CLOCK_SPEED_F4 = 4, CLOCK_SPEED_F5 = 5, /* The default clock speed is always Ftune's F1 */ CLOCK_SPEED_DEFAULT = CLOCK_SPEED_F1, }
+enum
+{
+  /* Combinations of hardware settings that are none of Ftune's levels */ CLOCK_SPEED_UNKNOWN = 0, /* Ftune's 5 default overclock levels. The main settings are listed below, though many more are involved. On SH3 fx-9860G-like: F1: CPU @ 29 MHz [Default speed] F2: CPU @ 58 MHz [Similar to G-III default] F3: CPU @ 88 MHz F4: CPU @ 118 MHz [Fastest CPU option] F5: CPU @ 118 MHz [Reduced memory wait times] On SH4 fx-9860G-like: F1: CPU @ 29 MHz, BFC @ 29 MHz [Default speed] F2: CPU @ 58 MHz, BFC @ 29 MHz [Similar to G-III default] F3: CPU @ 29 MHz, BFC @ 29 MHz [SH3 default] F4: CPU @ 118 MHz, BFC @ 59 MHz F5: CPU @ 236 MHz, BFC @ 118 MHz [Fastest option] On G-III / Graph 35+E II: F1: CPU @ 58 MHz, BFC @ 29 MHz [Default speed] F2: CPU @ 58 MHz, BFC @ 29 MHz [fx-CG 10/20 default] F3: CPU @ 29 MHz, BFC @ 29 MHz [SH3 default] F4: CPU @ 118 MHz, BFC @ 58 MHz F5: CPU @ 235 MHz, BFC @ 58 MHz [Fastest option] On fx-CG 10/20: F1: CPU @ 58 MHz, BFC @ 29 MHz [Default speed] F2: CPU @ 58 MHz, BFC @ 29 MHz [Improved memory speed] F3: CPU @ 118 MHz, BFC @ 58 MHz [Faster than F2] F4: CPU @ 118 MHz, BFC @ 118 MHz [Fastest bus option] F5: CPU @ 191 MHz, BFC @ 94 MHz [Fastest CPU option] On fx-CG 50: F1: CPU @ 116 MHz, BFC @ 58 MHz [Default speed] F2: CPU @ 58 MHz, BFC @ 29 MHz [fx-CG 10/20 default] F3: CPU @ 94 MHz, BFC @ 47 MHz [Clearly slow: F2 < F3 < F1] F4: CPU @ 232 MHz, BFC @ 58 MHz [Fastest CPU option] F5: CPU @ 189 MHz, BFC @ 94 MHz [Fastest bus option] */ CLOCK_SPEED_F1 = 1, CLOCK_SPEED_F2 = 2, CLOCK_SPEED_F3 = 3, CLOCK_SPEED_F4 = 4, CLOCK_SPEED_F5 = 5, /* The default clock speed is always Ftune's F1 */ CLOCK_SPEED_DEFAULT = CLOCK_SPEED_F1,
+}
 ```
 
 If you want to faithfully save and restore the clock state while properly
@@ -155,5 +191,14 @@ WARNING: Applying random settings with cpg_set_overclock_setting() might
 damage your calculator!
 
 ```c
-struct cpg_overclock_setting { uint32_t FLLFRQ, FRQCR; uint32_t CS0BCR, CS2BCR, CS3BCR, CS5aBCR; uint32_t CS0WCR, CS2WCR, CS3WCR, CS5aWCR; }
+struct cpg_overclock_setting
+{
+  uint32_t FLLFRQ, FRQCR;
+  uint32_t CS0BCR, CS2BCR, CS3BCR, CS5aBCR;
+  uint32_t CS0WCR, CS2WCR, CS3WCR, CS5aWCR;
+}
 ```
+
+## Source
+
+- [Header `<gint/clock.h>`](https://github.com/ClasspadDev/gint/blob/dev/include/gint/clock.h)

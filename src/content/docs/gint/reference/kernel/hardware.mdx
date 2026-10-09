@@ -3,6 +3,10 @@ title: "Hardware"
 description: "Platform information and hardware detection"
 ---
 
+:::note[Unofficial documentation]
+Community-written docs, valid for the ClassPad port only, possibly slightly outdated. They will be replaced by the official gint documentation once it is published.
+:::
+
 
 This components centralizes detected information about the runtime
 hardware, including MPU version, peripheral modules, and how drivers
@@ -312,3 +316,7 @@ Wrapper around Kyoto Software Research's Fugue VFAT implementation.
 #define isSH4 (()) 1
 #define isSlim (()) 0
 ```
+
+## Source
+
+- [Header `<gint/hardware.h>`](https://github.com/ClasspadDev/gint/blob/dev/include/gint/hardware.h)

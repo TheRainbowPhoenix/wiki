@@ -3,6 +3,10 @@ title: "MMU"
 description: "Memory Management Unit"
 ---
 
+:::note[Unofficial documentation]
+Community-written docs, valid for the ClassPad port only, possibly slightly outdated. They will be replaced by the official gint documentation once it is published.
+:::
+
 ## Functions
 
 ### `mmu_translate`
@@ -187,3 +191,7 @@ Returns a pointer to the entry.
 ```c
 itlb_data_t const *itlb_data(uint E)
 ```
+
+## Source
+
+- [Header `<gint/mmu.h>`](https://github.com/ClasspadDev/gint/blob/dev/include/gint/mmu.h)

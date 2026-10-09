@@ -3,6 +3,10 @@ title: "Driver: keydev"
 description: "Kernel's keyboard input devices"
 ---
 
+:::note[Unofficial documentation]
+Community-written docs, valid for the ClassPad port only, possibly slightly outdated. They will be replaced by the official gint documentation once it is published.
+:::
+
 ## Functions
 
 ### `keydev_std`
@@ -258,7 +262,12 @@ typedef int (*keydev_repeat_profile_t)(int key, int duration, int count)
 keydev_transform_t: Full specification for transforms on the event stream
 
 ```c
-typedef struct { /* List of enabled transforms. The order is cannot be changed because any other order than the default produces useless results. This is an OR-combination of KEYDEV_TR_* flags. */ int enabled; /* Repeater function. This function is called whenever (key) is pressed (KEYEV_DOWN) or repeated (KEYEV_HOLD), and should indicate how long to wait until the next repeat. This setting is meaningful only if <Repeats> is enabled. -> (key) is the key currently being repeated. -> (duration) is the time since it was first pressed (us). -> (count) is the number of repeats produced so far. The function should either return -1 to disable all further repeats, or a positive number of microseconds until the next repeat. Note that the precision of the delay is limited by the speed at which the keyboard is scanned, which is nowhere near microsecond-level. By default (128 Hz) the precision is about 7.8 ms. */ keydev_repeat_profile_t repeater; } GPACKEDENUM keydev_transform_t
+typedef struct
+{
+  /* List of enabled transforms. The order is cannot be changed because any other order than the default produces useless results. This is an OR-combination of KEYDEV_TR_* flags. */ int enabled;
+  /* Repeater function. This function is called whenever (key) is pressed (KEYEV_DOWN) or repeated (KEYEV_HOLD), and should indicate how long to wait until the next repeat. This setting is meaningful only if <Repeats> is enabled. -> (key) is the key currently being repeated. -> (duration) is the time since it was first pressed (us). -> (count) is the number of repeats produced so far. The function should either return -1 to disable all further repeats, or a positive number of microseconds until the next repeat. Note that the precision of the delay is limited by the speed at which the keyboard is scanned, which is nowhere near microsecond-level. By default (128 Hz) the precision is about 7.8 ms. */ keydev_repeat_profile_t repeater;
+}
+GPACKEDENUM keydev_transform_t
 ```
 
 keydev_async_filter_t: Low-level asynchronous event filter.
@@ -285,11 +294,43 @@ keydown() are shortcuts for keydev functions using the physical keyboard as
 their input.
 
 ```c
-typedef struct { /* Current device time in scanning-ticks */ uint time; /* Last time when repeats were considered */ uint time_repeats; /* Next event in queue, position after last event in queue */ int8_t queue_next; int8_t queue_end; /* Number of events lost because of missing queue space */ uint16_t events_lost; /* Event transforms */ keydev_transform_t tr; /* Asynchronous event filter. This is a low-level filter which is called when events are generated to process and filter them. It provides the unique ability to run keyboard-triggered code even if the program's main thread is busy, for instance running some sort of infinite loop. */ keydev_async_filter_t async_filter; // <Delayed Modifiers> /* delayed_* is set when the delayed modifier is active (after a press/ release). pressed_* is set between the press and the release. */ uint pressed_shift :1; uint pressed_alpha :1; uint delayed_shift :1; uint delayed_alpha :1; uint :4; // <Repeats> /* Candidate key for repeats (or 0 if no key is candidate yet) */ int16_t rep_key; /* Matrix code for rep_key, if rep_key is not 0. */ uint8_t rep_row, rep_col; /* Number of repeats already sent */ int16_t rep_count; /* Time since key was first pressed (us) */ int rep_time; /* Delay until next repeat, set by the repeat planner (us) */ int rep_delay; /* Latest state of keys we are aware of. At every processing step, the difference between this and the fresh information is queued and this is updated. state_now is identical to the real state obtained from the device unless earlier events failed to be queued, in which case a difference is maintained so they will be reconsidered later. */ GALIGNED(4) uint8_t state_now[12]; /* State of keys based on produced events. (state_queue + queue) is always identical to (state_now). When the queue is empty both states are the same. This is the user's view of the keyboard. */ GALIGNED(4) uint8_t state_queue[12]; /* Event queue (circular buffer) */ key_event_t queue[KEYBOARD_QUEUE_SIZE]; /* Parameters for the standard repeat function */ int rep_standard_first, rep_standard_next; /* State of keys that have changes since the last flip monitoring reset. */ GALIGNED(4) uint8_t state_flips[12]; } keydev_t
+typedef struct
+{
+  /* Current device time in scanning-ticks */ uint time;
+  /* Last time when repeats were considered */ uint time_repeats;
+  /* Next event in queue, position after last event in queue */ int8_t queue_next;
+  int8_t queue_end;
+  /* Number of events lost because of missing queue space */ uint16_t events_lost;
+  /* Event transforms */ keydev_transform_t tr;
+  /* Asynchronous event filter. This is a low-level filter which is called when events are generated to process and filter them. It provides the unique ability to run keyboard-triggered code even if the program's main thread is busy, for instance running some sort of infinite loop. */ keydev_async_filter_t async_filter;
+  // <Delayed Modifiers> /* delayed_* is set when the delayed modifier is active (after a press/ release). pressed_* is set between the press and the release. */ uint pressed_shift :1;
+  uint pressed_alpha :1;
+  uint delayed_shift :1;
+  uint delayed_alpha :1;
+  uint :4;
+  // <Repeats> /* Candidate key for repeats (or 0 if no key is candidate yet) */ int16_t rep_key;
+  /* Matrix code for rep_key, if rep_key is not 0. */ uint8_t rep_row, rep_col;
+  /* Number of repeats already sent */ int16_t rep_count;
+  /* Time since key was first pressed (us) */ int rep_time;
+  /* Delay until next repeat, set by the repeat planner (us) */ int rep_delay;
+  /* Latest state of keys we are aware of. At every processing step, the difference between this and the fresh information is queued and this is updated. state_now is identical to the real state obtained from the device unless earlier events failed to be queued, in which case a difference is maintained so they will be reconsidered later. */ GALIGNED(4) uint8_t state_now[12];
+  /* State of keys based on produced events. (state_queue + queue) is always identical to (state_now). When the queue is empty both states are the same. This is the user's view of the keyboard. */ GALIGNED(4) uint8_t state_queue[12];
+  /* Event queue (circular buffer) */ key_event_t queue[KEYBOARD_QUEUE_SIZE];
+  /* Parameters for the standard repeat function */ int rep_standard_first, rep_standard_next;
+  /* State of keys that have changes since the last flip monitoring reset. */ GALIGNED(4) uint8_t state_flips[12];
+}
+keydev_t
 ```
 
 ## Data structures
 
 ```c
-enum { /* Delayed SHIFT: Pressing then immediately releasing SHIFT when the keyboard is idle applies SHIFT to the next repeat streak. */ KEYDEV_TR_DELAYED_SHIFT = 0x01, /* = GETKEY_MOD_SHIFT */ /* Delayed ALPHA: Idem with the ALPHA key */ KEYDEV_TR_DELAYED_ALPHA = 0x02, /* = GETKEY_MOD_ALPHA */ /* Combination of the delayed modifiers */ KEYDEV_TR_DELAYED_MODS = KEYDEV_TR_DELAYED_SHIFT | KEYDEV_TR_DELAYED_ALPHA, /* Instant SHIFT: Each individual event of every repeat streak gets SHIFT applied if SHIFT is pressed at the time of the repeat. */ KEYDEV_TR_INSTANT_SHIFT = 0x04, /* Instant ALPHA: Idem with the ALPHA key */ KEYDEV_TR_INSTANT_ALPHA = 0x08, /* Combination of the instance modifiers */ KEYDEV_TR_INSTANT_MODS = KEYDEV_TR_INSTANT_SHIFT | KEYDEV_TR_INSTANT_ALPHA, /* Combination of all modifiers */ KEYDEV_TR_ALL_MODS = KEYDEV_TR_DELAYED_MODS | KEYDEV_TR_INSTANT_MODS, /* Repeats: Keys are repeated according to a repeat filter function */ KEYDEV_TR_REPEATS = 0x10, /* Delete Modifiers: Remove modifier keys from generated events, which are generally useless when delayed/instant SHIFT/ALPHA are used */ KEYDEV_TR_DELETE_MODIFIERS = 0x20, /* Delete Releases: Remove KEYEV_UP events */ KEYDEV_TR_DELETE_RELEASES = 0x40, }
+enum
+{
+  /* Delayed SHIFT: Pressing then immediately releasing SHIFT when the keyboard is idle applies SHIFT to the next repeat streak. */ KEYDEV_TR_DELAYED_SHIFT = 0x01, /* = GETKEY_MOD_SHIFT */ /* Delayed ALPHA: Idem with the ALPHA key */ KEYDEV_TR_DELAYED_ALPHA = 0x02, /* = GETKEY_MOD_ALPHA */ /* Combination of the delayed modifiers */ KEYDEV_TR_DELAYED_MODS = KEYDEV_TR_DELAYED_SHIFT | KEYDEV_TR_DELAYED_ALPHA, /* Instant SHIFT: Each individual event of every repeat streak gets SHIFT applied if SHIFT is pressed at the time of the repeat. */ KEYDEV_TR_INSTANT_SHIFT = 0x04, /* Instant ALPHA: Idem with the ALPHA key */ KEYDEV_TR_INSTANT_ALPHA = 0x08, /* Combination of the instance modifiers */ KEYDEV_TR_INSTANT_MODS = KEYDEV_TR_INSTANT_SHIFT | KEYDEV_TR_INSTANT_ALPHA, /* Combination of all modifiers */ KEYDEV_TR_ALL_MODS = KEYDEV_TR_DELAYED_MODS | KEYDEV_TR_INSTANT_MODS, /* Repeats: Keys are repeated according to a repeat filter function */ KEYDEV_TR_REPEATS = 0x10, /* Delete Modifiers: Remove modifier keys from generated events, which are generally useless when delayed/instant SHIFT/ALPHA are used */ KEYDEV_TR_DELETE_MODIFIERS = 0x20, /* Delete Releases: Remove KEYEV_UP events */ KEYDEV_TR_DELETE_RELEASES = 0x40,
+}
 ```
+
+## Source
+
+- [Header `<gint/drivers/keydev.h>`](https://github.com/ClasspadDev/gint/blob/dev/include/gint/drivers/keydev.h)
