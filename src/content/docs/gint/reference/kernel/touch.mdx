@@ -1,0 +1,47 @@
+---
+title: "Touch"
+description: "touch-screen driver API"
+---
+
+## Functions
+
+### `touch_calib_get`
+
+touch_calib_get() - get calibration information
+
+```c
+extern int touch_calib_get(touch_calibration_t *calib)
+```
+
+---
+
+### `touch_calib_get_os`
+
+touch_calib_get_os() - get OS calibration information, if available
+Returns 0 on success, negative number if not available.
+
+```c
+extern int touch_calib_get_os(touch_calibration_t *calib)
+```
+
+---
+
+### `touch_calib_set`
+
+touch_calib_set() - set calibration information
+
+```c
+extern int touch_calib_set(touch_calibration_t *calib)
+```
+
+## Macros
+
+```c
+#define GINT_TOUCH_H 1
+```
+
+## Types
+
+```c
+typedef struct { int x_base; int x_div; int y_base; int y_div; int dual_debounce_frame; int dual_sensi_entry; int dual_sensi_leave; } touch_calibration_t
+```

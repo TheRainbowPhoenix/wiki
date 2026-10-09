@@ -5,97 +5,101 @@ sidebar:
   order: 0
 ---
 
-This is the API reference for the **gint kernel headers**. The ClassPad port of gint targets **fxCP** (the fx-CP400). Some pages document hardware that only exists on other models (fx-9860G and fx-CG 50 only: `display-fx`, `gray`, `t6k11`, `r61524`). Those pages are included for completeness and do not fully apply to the ClassPad.
+This is the API reference for the **gint kernel headers**, generated from the gint source for the ClassPad port (target **fxCP**, the fx-CP400). Pages are generated directly from the headers with preprocessor conditions resolved for the ClassPad, so only APIs that exist on this platform are listed.
+
+Hardware that only exists on other models is not covered here (fx-9860G and fx-CG 50 only: `display-fx`, `gray`, the `t6k11` and `r61524` drivers). Those headers are excluded from generation.
+
+:::note[Unofficial documentation]
+These are unofficial docs, written and maintained by the community until gint publishes its official documentation. They are valid for the ClassPad port, but they may be slightly outdated, and they only cover the ClassPad, while gint also works on other calculators.
+:::
 
 ## Core Modules
 
-- [gint](/wiki/gint/reference/kernel/gint/) - Main gint header with initialization and core functions
-- [hardware](/wiki/gint/reference/kernel/hardware/) - Hardware detection and platform information
-- [cpu](/wiki/gint/reference/kernel/cpu/) - CPU identification and features
-- [clock](/wiki/gint/reference/kernel/clock/) - Clock frequency and timing utilities
-- [timer](/wiki/gint/reference/kernel/timer/) - Timer management and sleep functions
+- [gint](/wiki/gint/reference/kernel/gint/) - gint
+- [Hardware](/wiki/gint/reference/kernel/hardware/) - Hardware
+- [CPU](/wiki/gint/reference/kernel/cpu/) - CPU
+- [Clock](/wiki/gint/reference/kernel/clock/) - Clock
+- [Timer](/wiki/gint/reference/kernel/timer/) - Timer
+- [Profiling](/wiki/gint/reference/kernel/prof/) - Profiling
 
 ## Display and Graphics
 
-- [Display](/wiki/gint/reference/kernel/display/) - Drawing functions for both platforms
-- [Display: fx-9860G](/wiki/gint/reference/kernel/display-fx/) - fx-9860G display specifics
-- [Display: fx-CG 50](/wiki/gint/reference/kernel/display-cg/) - fx-CG 50 display specifics
-- [Gray](/wiki/gint/reference/kernel/gray/) - Gray engine for fx-9860G
-- [Image](/wiki/gint/reference/kernel/image/) - Image manipulation and rendering
-- [Video](/wiki/gint/reference/kernel/video/) - Video capture and output
+- [Display](/wiki/gint/reference/kernel/display/) - Display
+- [Display: fx-CG 50](/wiki/gint/reference/kernel/display-cg/) - Display: fx-CG 50
+- [Image](/wiki/gint/reference/kernel/image/) - Image
+- [Video](/wiki/gint/reference/kernel/video/) - Video
 
 ## Input
 
-- [Keyboard](/wiki/gint/reference/kernel/keyboard/) - Keyboard scanning and input
-- [Keycodes](/wiki/gint/reference/kernel/keycodes/) - Key code definitions
+- [Keyboard](/wiki/gint/reference/kernel/keyboard/) - Keyboard
+- [Keycodes](/wiki/gint/reference/kernel/keycodes/) - Keycodes
+- [Driver: iokbd](/wiki/gint/reference/kernel/drivers/iokbd/) - Driver: iokbd
 
 ## Memory Management
 
-- [kmalloc](/wiki/gint/reference/kernel/kmalloc/) - Kernel memory allocator
-- [MMU](/wiki/gint/reference/kernel/mmu/) - Memory management unit control
+- [kmalloc](/wiki/gint/reference/kernel/kmalloc/) - kmalloc
+- [MMU](/wiki/gint/reference/kernel/mmu/) - MMU
+- [Driver: states](/wiki/gint/reference/kernel/drivers/states/) - Driver: states
 
 ## File System
 
-- [Filesystem](/wiki/gint/reference/kernel/fs/) - File system operations
-- [BFile](/wiki/gint/reference/kernel/bfile/) - BFile API for file access
+- [Filesystem](/wiki/gint/reference/kernel/fs/) - Filesystem
+- [BFile](/wiki/gint/reference/kernel/bfile/) - BFile
 
 ## Drivers
 
-- [Drivers](/wiki/gint/reference/kernel/drivers/) - Driver framework overview
-- [Driver: asyncio](/wiki/gint/reference/kernel/drivers/asyncio/) - Asynchronous I/O driver
-- [Driver: iokbd](/wiki/gint/reference/kernel/drivers/iokbd/) - Keyboard I/O driver
-- [Driver: keydev](/wiki/gint/reference/kernel/drivers/keydev/) - Key device driver
-- [Driver: r61523](/wiki/gint/reference/kernel/drivers/r61523/) - R61523 display controller
-- [Driver: r61524](/wiki/gint/reference/kernel/drivers/r61524/) - R61524 display controller
-- [Driver: states](/wiki/gint/reference/kernel/drivers/states/) - Power state management
-- [Driver: t6k11](/wiki/gint/reference/kernel/drivers/t6k11/) - T6K11 display controller
+- [Drivers](/wiki/gint/reference/kernel/drivers/) - Drivers
+- [Driver: asyncio](/wiki/gint/reference/kernel/drivers/asyncio/) - Driver: asyncio
+- [Driver: keydev](/wiki/gint/reference/kernel/drivers/keydev/) - Driver: keydev
+- [Driver: r61523](/wiki/gint/reference/kernel/drivers/r61523/) - Driver: r61523
+- [Driver: touch](/wiki/gint/reference/kernel/drivers/touch/) - Driver: touch
 
 ## MPU (Microprocessor Unit)
 
-- [MPU: BSC](/wiki/gint/reference/kernel/mpu/bsc/) - Bus state controller
-- [MPU: CPG](/wiki/gint/reference/kernel/mpu/cpg/) - Clock pulse generator
-- [MPU: DMA](/wiki/gint/reference/kernel/mpu/dma/) - Direct memory access
-- [MPU: INTC](/wiki/gint/reference/kernel/mpu/intc/) - Interrupt controller
-- [MPU: MMU](/wiki/gint/reference/kernel/mpu/mmu/) - Memory management unit
-- [MPU: PFC](/wiki/gint/reference/kernel/mpu/pfc/) - Pin function controller
-- [MPU: Power](/wiki/gint/reference/kernel/mpu/power/) - Power management
-- [MPU: RTC](/wiki/gint/reference/kernel/mpu/rtc/) - Real-time clock
-- [MPU: SCIF](/wiki/gint/reference/kernel/mpu/scif/) - Serial communication interface
-- [MPU: SPU](/wiki/gint/reference/kernel/mpu/spu/) - Sound processing unit
-- [MPU: TMU](/wiki/gint/reference/kernel/mpu/tmu/) - Timer module unit
-- [MPU: UBC](/wiki/gint/reference/kernel/mpu/ubc/) - User break controller
-- [MPU: USB](/wiki/gint/reference/kernel/mpu/usb/) - USB controller
-- [MPU: WDT](/wiki/gint/reference/kernel/mpu/wdt/) - Watchdog timer
+- [MPU: BSC](/wiki/gint/reference/kernel/mpu/bsc/) - MPU: BSC
+- [MPU: CPG](/wiki/gint/reference/kernel/mpu/cpg/) - MPU: CPG
+- [MPU: DMA](/wiki/gint/reference/kernel/mpu/dma/) - MPU: DMA
+- [MPU: FSI](/wiki/gint/reference/kernel/mpu/fsi/) - MPU: FSI
+- [MPU: I2C](/wiki/gint/reference/kernel/mpu/i2c/) - MPU: I2C
+- [MPU: INTC](/wiki/gint/reference/kernel/mpu/intc/) - MPU: INTC
+- [MPU: KEYSC](/wiki/gint/reference/kernel/mpu/keysc/) - MPU: KEYSC
+- [MPU: MMU](/wiki/gint/reference/kernel/mpu/mmu/) - MPU: MMU
+- [MPU: PFC](/wiki/gint/reference/kernel/mpu/pfc/) - MPU: PFC
+- [MPU: power](/wiki/gint/reference/kernel/mpu/power/) - MPU: power
+- [MPU: RTC](/wiki/gint/reference/kernel/mpu/rtc/) - MPU: RTC
+- [MPU: SCIF](/wiki/gint/reference/kernel/mpu/scif/) - MPU: SCIF
+- [MPU: SPU](/wiki/gint/reference/kernel/mpu/spu/) - MPU: SPU
+- [MPU: TMU](/wiki/gint/reference/kernel/mpu/tmu/) - MPU: TMU
+- [MPU: UBC](/wiki/gint/reference/kernel/mpu/ubc/) - MPU: UBC
+- [MPU: USB](/wiki/gint/reference/kernel/mpu/usb/) - MPU: USB
+- [MPU: WDT](/wiki/gint/reference/kernel/mpu/wdt/) - MPU: WDT
 
 ## USB
 
-- [USB](/wiki/gint/reference/kernel/usb/) - USB stack and device management
-- [USB: FF-Bulk](/wiki/gint/reference/kernel/usb-ff-bulk/) - Full-speed bulk transfer class
+- [USB](/wiki/gint/reference/kernel/usb/) - USB
+- [USB: FF-Bulk](/wiki/gint/reference/kernel/usb-ff-bulk/) - USB: FF-Bulk
 
 ## System Utilities
 
-- [DMA](/wiki/gint/reference/kernel/dma/) - DMA helper functions
-- [INTC](/wiki/gint/reference/kernel/intc/) - Interrupt handling
-- [RTC](/wiki/gint/reference/kernel/rtc/) - RTC helper functions
-- [Serial](/wiki/gint/reference/kernel/serial/) - Serial port utilities
-- [UBC](/wiki/gint/reference/kernel/ubc/) - Debug breakpoints
-- [Exceptions](/wiki/gint/reference/kernel/exc/) - Exception handling
-- [GDB](/wiki/gint/reference/kernel/gdb/) - GDB stub for debugging
-
-## Standard Library
-
-- [Std: stdio](/wiki/gint/reference/kernel/std/stdio/) - Standard I/O functions
-- [Std: stdlib](/wiki/gint/reference/kernel/std/stdlib/) - Standard library utilities
-- [Std: string](/wiki/gint/reference/kernel/std/string/) - String manipulation
-- [Std: endian](/wiki/gint/reference/kernel/std/endian/) - Byte order conversion
+- [DMA](/wiki/gint/reference/kernel/dma/) - DMA
+- [INTC](/wiki/gint/reference/kernel/intc/) - INTC
+- [RTC](/wiki/gint/reference/kernel/rtc/) - RTC
+- [Serial](/wiki/gint/reference/kernel/serial/) - Serial
+- [UBC](/wiki/gint/reference/kernel/ubc/) - UBC
+- [Exceptions](/wiki/gint/reference/kernel/exc/) - Exceptions
+- [GDB](/wiki/gint/reference/kernel/gdb/) - GDB
 
 ## Type Definitions and Utilities
 
-- [Defs: types](/wiki/gint/reference/kernel/defs/types/) - Basic type definitions
-- [Defs: attributes](/wiki/gint/reference/kernel/defs/attributes/) - Compiler attributes
-- [Defs: GINT_CALL](/wiki/gint/reference/kernel/defs/call/) - Indirect call mechanism
-- [Defs: timeout](/wiki/gint/reference/kernel/defs/timeout/) - Timeout handling
-- [Defs: util](/wiki/gint/reference/kernel/defs/util/) - Utility macros and functions
+- [Defs: types](/wiki/gint/reference/kernel/defs/types/) - Defs: types
+- [Defs: attributes](/wiki/gint/reference/kernel/defs/attributes/) - Defs: attributes
+- [Defs: GINT_CALL](/wiki/gint/reference/kernel/defs/call/) - Defs: GINT_CALL
+- [Defs: timeout](/wiki/gint/reference/kernel/defs/timeout/) - Defs: timeout
+- [Defs: util](/wiki/gint/reference/kernel/defs/util/) - Defs: util
+
+## Other
+
+- [Touch](/wiki/gint/reference/kernel/touch/) - Touch
 
 ## JustUI Framework
 

@@ -3,31 +3,84 @@ title: "Serial"
 description: "Serial communication"
 ---
 
-
 ## Functions
 
 ### `serial_open`
 
-Data width (valid options are 7 and 8)
+TODO: Error management...
 
 ```c
-int serial_open(serial_config_t const *config);
+int serial_open(serial_config_t const *config)
 ```
 
 ---
 
-### `serial_open`
-
-Stop bits (valid options are 1 and 2)
+### `serial_is_open`
 
 ```c
-int serial_open(serial_config_t const *config);
+bool serial_is_open(void)
 ```
 
 ---
 
-## Macros
+### `serial_write_async`
 
-## Implementation
+```c
+void serial_write_async(void const *data, size_t size, gint_call_t callback)
+```
 
-Implementation is in the gint source tree.
+---
+
+### `serial_write_sync`
+
+```c
+void serial_write_sync(void const *data, size_t size)
+```
+
+---
+
+### `serial_read_async`
+
+```c
+void serial_read_async(void const *data, size_t size, gint_call_t callback)
+```
+
+---
+
+### `serial_read_sync`
+
+```c
+void serial_read_sync(void const *data, size_t size)
+```
+
+---
+
+### `serial_wait`
+
+Waits for communications to finish
+
+```c
+void serial_wait(void)
+```
+
+---
+
+### `serial_close`
+
+Calls serial_wait() automatically
+
+```c
+void serial_close(void)
+```
+
+## Types
+
+TODO: This is a template for a future implementation.
+
+```c
+typedef enum { SERIAL_PARITY_NONE, SERIAL_PARITY_EVEN, SERIAL_PARITY_ODD, } GPACKEDENUM serial_parity_t
+```
+
+```c
+typedef struct { /* Baud rate (valid options are 300, 600, 1200, 2400, 4800, 9600, 19200, 38400, 57600 and 115200) */ int baudrate; /* Parity */ serial_parity_t parity; /* Data width (valid options are 7 and 8) */ uint8_t data_width; /* Stop bits (valid options are 1 and 2) */ uint8_t stop_bits; } serial_config_t
+```

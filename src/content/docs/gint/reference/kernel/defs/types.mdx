@@ -3,7 +3,6 @@ title: "Defs: types"
 description: "Type definitions"
 ---
 
-
 ## Macros
 
 ### `pad_nam2`
@@ -11,66 +10,90 @@ description: "Type definitions"
 Giving a type to padding bytes is misguiding, let's hide it in a macro
 
 ```c
-#define pad_nam2(c) _ ## c
+#define pad_nam2 ((c)) _ ## c
 ```
-
----
-
-### `pad_name`
-
-```c
-#define pad_name(c) pad_nam2(c)
-```
-
----
-
-### `pad`
-
-```c
-#define pad(bytes) uint8_t pad_name(__COUNTER__)[bytes]
-```
-
----
 
 ### `byte_union`
 
 byte_union() - union between an uint8_t 'byte' element and a bit field
 
 ```c
-#define byte_union(name, fields) \
+#define byte_union ((name, fields)) \
+	union {					\
+		uint8_t byte;			\
+		struct { fields } GPACKED(1);	\
+	} GPACKED(1) name
 ```
-
----
 
 ### `word_union`
 
 word_union() - union between an uint16_t 'word' element and a bit field
 
 ```c
-#define word_union(name, fields) \
+#define word_union ((name, fields)) \
+	union {					\
+		uint16_t word;			\
+		struct { fields } GPACKED(2);	\
+	} GPACKED(2) name
 ```
-
----
 
 ### `lword_union`
 
 lword_union() - union between an uint32_t 'lword' element and a bit field
 
 ```c
-#define lword_union(name, fields) \
+#define lword_union ((name, fields)) \
+	union {					\
+		uint32_t lword;			\
+		struct { fields } GPACKED(4);	\
+	} GPACKED(4) name
 ```
 
----
+```c
+#define pad_name ((c)) pad_nam2(c)
+#define pad ((bytes)) uint8_t pad_name(__COUNTER__)[bytes]
+```
 
-## Implementation
+## Types
 
-Source files:
+Fixed-width types for bit fields are quite meaningless
 
-- [src/rtc/rtc.c](https://github.com/ClasspadDev/gint/blob/dev/src/rtc/rtc.c)
-- [src/gray/engine.c](https://github.com/ClasspadDev/gint/blob/dev/src/gray/engine.c)
-- [src/gray/gpixel.c](https://github.com/ClasspadDev/gint/blob/dev/src/gray/gpixel.c)
-- [src/gray/ggetpixel.c](https://github.com/ClasspadDev/gint/blob/dev/src/gray/ggetpixel.c)
-- [src/r61524/r61524.c](https://github.com/ClasspadDev/gint/blob/dev/src/r61524/r61524.c)
-- [src/kernel/hardware.c](https://github.com/ClasspadDev/gint/blob/dev/src/kernel/hardware.c)
-- [src/kernel/hhk3_start.c](https://github.com/ClasspadDev/gint/blob/dev/src/kernel/hhk3_start.c)
-- [src/kernel/start.c](https://github.com/ClasspadDev/gint/blob/dev/src/kernel/start.c)
+```c
+typedef unsigned int uint
+```
+
+```c
+typedef unsigned int uint
+```
+
+```c
+typedef uint8_t u8
+```
+
+```c
+typedef uint16_t u16
+```
+
+```c
+typedef uint32_t u32
+```
+
+```c
+typedef uint64_t u64
+```
+
+```c
+typedef int8_t i8
+```
+
+```c
+typedef int16_t i16
+```
+
+```c
+typedef int32_t i32
+```
+
+```c
+typedef int64_t i64
+```
