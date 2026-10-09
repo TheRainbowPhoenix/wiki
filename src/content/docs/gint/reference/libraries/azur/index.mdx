@@ -1,0 +1,46 @@
+---
+title: Azur
+description: Azur renderer notes for gint on ClassPad
+sidebar:
+  order: 1
+---
+
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+
+Azur is a rendering library and small engine layer for calculator games. On ClassPad, the useful part is the `gint` renderer in `<azur/gint/render.h>`.
+
+Azur does not draw each command directly to the display. Instead, it records drawing commands, sorts them by screen fragment, then renders the fragments and sends them to the LCD. This is useful for games that draw many shapes, text, or images every frame.
+
+ClassPad support was added in the Azur repository with the FxCP port. The first ClassPad support commit is `0367526a40`, then `443a6ce` finalized the port.
+
+## What Azur gives you
+
+- A fast command-based renderer for `gint`
+- Drawing functions such as `azrp_clear`, `azrp_rect`, `azrp_triangle`, `azrp_line`, `azrp_text` and `azrp_print`
+- Image drawing helpers using `gint` images
+- Performance counters for command generation, sorting, shaders, LCD transfer and total render time
+- A C++ main loop helper with separate update and render callbacks
+
+## ClassPad notes
+
+Use `fxsdk build-cp` for ClassPad projects. The output is a `.hh3` file generated with `generate_hh3`.
+
+Azur on ClassPad uses the `gint` backend. You normally link `Azur::Azur` with `Gint::Gint`.
+
+The ClassPad screen is `320x528`. Colors are usually 16-bit RGB555 values created with `C_RGB(r, g, b)`, where each component goes from `0` to `31`.
+
+## Pages
+
+<CardGrid>
+  <LinkCard
+    title="Getting Started"
+    href="./tutorial"
+    description="Build a small Azur demo with a color-changing triangle and performance counters."
+  />
+  <LinkCard
+    title="Renderer Reference"
+    href="./reference"
+    description="Quick reference for the most useful Azur renderer calls on ClassPad."
+  />
+</CardGrid>
+

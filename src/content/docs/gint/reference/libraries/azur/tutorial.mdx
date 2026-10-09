@@ -1,0 +1,327 @@
+---
+title: Getting Started
+description: Build a small Azur demo for ClassPad
+sidebar:
+  order: 1
+---
+
+# Getting Started with Azur
+
+This tutorial builds a small ClassPad app with Azur. It clears the screen, draws a color-changing triangle, prints performance counters, and exits when you press `EXIT`.
+
+The final source is a C++ file because `azur_main_loop()` uses C++ callbacks.
+
+## Step 1: Create a project
+
+Start from a normal `fxSDK` project.
+
+```bash
+fxsdk new test
+cd test
+```
+
+Create a `src/main.cxx` file for the code below. If the template created `src/main.c`, replace it with `src/main.cxx`.
+
+## Step 2: Configure CMake
+
+Your `CMakeLists.txt` must find `gint`, find `Azur`, link both libraries, and generate an `.hh3` file on ClassPad.
+
+```cmake
+cmake_minimum_required(VERSION 3.15)
+project(TestAzur VERSION 0.1 LANGUAGES CXX C ASM)
+
+include(GenerateG1A)
+include(GenerateG3A)
+include(GenerateHH3)
+include(Fxconv)
+
+find_package(Gint 2.9 REQUIRED)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(SOURCES
+  src/main.cxx
+)
+
+set(ASSETS)
+set(ASSETS_fx
+  assets-fx/example.png
+)
+set(ASSETS_cg
+  assets-cg/example.png
+)
+
+fxconv_declare_assets(${ASSETS} ${ASSETS_fx} ${ASSETS_cg} WITH_METADATA)
+
+list(APPEND CMAKE_MODULE_PATH "$ENV{AZUR_PATH_${AZUR_PLATFORM}}/lib/cmake")
+find_package(Azur 0.1 REQUIRED)
+
+add_executable(TestAzur ${SOURCES} ${ASSETS} ${ASSETS_${FXSDK_PLATFORM}})
+target_compile_options(TestAzur PRIVATE -Wall -Wextra -Os -g -flto=auto)
+target_link_libraries(TestAzur Gint::Gint)
+
+if(AZUR_PLATFORM STREQUAL gint)
+  target_link_libraries(TestAzur Azur::Azur)
+else()
+  target_link_libraries(TestAzur Azur::Azur Azur::GLM Azur::ImGui)
+endif()
+
+if("${FXSDK_PLATFORM_LONG}" STREQUAL fx9860G)
+  generate_g1a(TARGET TestAzur OUTPUT "TestAzur.g1a"
+    NAME "TestAzur" ICON assets-fx/icon.png)
+elseif("${FXSDK_PLATFORM_LONG}" STREQUAL fxCG50)
+  generate_g3a(TARGET TestAzur OUTPUT "TestAzur.g3a"
+    NAME "TestAzur" ICONS assets-cg/icon-uns.png assets-cg/icon-sel.png)
+elseif("${FXSDK_PLATFORM_LONG}" STREQUAL fx9860G_G3A)
+  generate_g3a(TARGET TestAzur OUTPUT "TestAzur-fx.g3a"
+    NAME "TestAzur-fx" ICONS assets-cg/icon-uns.png assets-cg/icon-sel.png)
+elseif("${FXSDK_PLATFORM_LONG}" STREQUAL fxCP)
+  generate_hh3(TARGET TestAzur OUTPUT "TestAzur.hh3")
+endif()
+```
+
+When building for calculators, `find_package(Azur)` uses the fxSDK sysroot. If you build for Linux or web too, set the matching `AZUR_PATH_*` variable as described in the Azur README.
+
+## Step 3: Add the headers and metadata
+
+In `src/main.cxx`, start with the headers. The `HHK_NAME` and `HHK_AUTHOR` macros set the name shown by the Hollyhock launcher.
+
+```cpp
+#include <gint/config.h>
+#include <gint/display.h>
+#include <gint/keyboard.h>
+#include <gint/prof.h>
+#include <fxlibc/printf.h>
+#include <azur/gint/render.h>
+#include <azur/azur.h>
+
+HHK_NAME("Azur Demo")
+HHK_AUTHOR("ClassPadDev")
+```
+
+## Step 4: Keep a changing color
+
+The demo cycles through RGB555 colors. Each color component goes from `0` to `31`.
+
+```cpp
+static color_t color = C_RED;
+
+constexpr uint_fast8_t RGB5_MAX = (1 << 5) - 1;
+static uint_fast8_t red = RGB5_MAX;
+static uint_fast8_t green = 0;
+static uint_fast8_t blue = 0;
+```
+
+## Step 5: Write the update function
+
+The update function reads input and updates game state. Return a non-zero value to stop the app.
+
+On ClassPad, use `KEY_EXIT` to leave the app.
+
+```cpp
+static int update(void)
+{
+    for(auto ev = pollevent(); ev.type != KEYEV_NONE; ev = pollevent()) {
+        if(ev.type == KEYEV_UP && ev.key == KEY_EXIT) {
+            return 1;
+        }
+    }
+
+    if(red == RGB5_MAX && blue == 0) {
+        green++;
+    }
+    if(green == RGB5_MAX && blue == 0) {
+        red--;
+    }
+    if(green == RGB5_MAX && red == 0) {
+        blue++;
+    }
+    if(blue == RGB5_MAX && red == 0) {
+        green--;
+    }
+    if(blue == RGB5_MAX && green == 0) {
+        red++;
+    }
+    if(red == RGB5_MAX && green == 0) {
+        if(blue > 0) {
+            blue--;
+        }
+        else {
+            green++;
+        }
+    }
+
+    color = C_RGB(red, green, blue);
+    return 0;
+}
+```
+
+## Step 6: Write the renderer
+
+Azur drawing calls add commands to a queue. `azrp_update()` renders the queued commands and starts the next frame.
+
+This renderer clears the screen, draws a triangle, prints performance numbers, then updates the display.
+
+```cpp
+static uint32_t last_cmdgen = 0;
+
+static void renderer(void)
+{
+    azrp_clear(0xa534);
+
+    azrp_triangle(
+        azrp_width / 2 - 200 / 2, azrp_height / 2 - 200 / 2,
+        azrp_width / 2 + 200 / 2, azrp_height / 2 - 200 / 2,
+        azrp_width / 2 - 200 / 2, azrp_height / 2 + 200 / 2,
+        color
+    );
+
+    azrp_print(3, 10, 0x3811, "cmdgen: %.3Dms", last_cmdgen);
+    azrp_print(3, 25, 0x3811, "sort: %.3Dms", prof_time(azrp_perf_sort));
+    azrp_print(3, 40, 0x3811, "shaders: %.3Dms", prof_time(azrp_perf_shaders));
+    azrp_print(3, 55, 0x3811, "lcd: %.3Dms", prof_time(azrp_perf_lcd));
+    azrp_print(3, 70, 0x3811, "render: %.3Dms", prof_time(azrp_perf_render));
+
+    last_cmdgen = prof_time(azrp_perf_cmdgen);
+    azrp_perf_clear();
+    azrp_update();
+}
+```
+
+## Step 7: Start Azur
+
+Initialize the profiler, enable fixed-point printing for the `%.3Dms` format, set the Azur scale, then start the main loop.
+
+```cpp
+int main(void)
+{
+    prof_init();
+    __printf_enable_fixed();
+
+    azrp_config_scale(1);
+    azrp_cmdq_setup(AZRP_CMDQ_DEFAULT_INDEX_SIZE, AZRP_CMDQ_DEFAULT_DATA_SIZE);
+    azrp_perf_clear();
+
+    azur_main_loop(renderer, 30, update, 30, AZUR_MAIN_LOOP_TIED);
+    return 0;
+}
+```
+
+`azrp_config_scale(1)` uses the full ClassPad resolution. Higher scales render fewer pixels and can be faster, but they are more useful for games that can accept a lower internal resolution.
+
+`AZUR_MAIN_LOOP_TIED` runs the update just before the render. This is a good default for simple games.
+
+## Full demo
+
+Put this in `src/main.cxx`.
+
+```cpp
+#include <gint/config.h>
+#include <gint/display.h>
+#include <gint/keyboard.h>
+#include <gint/prof.h>
+#include <fxlibc/printf.h>
+#include <azur/gint/render.h>
+#include <azur/azur.h>
+
+HHK_NAME("Azur Demo")
+HHK_AUTHOR("ClassPadDev")
+
+static color_t color = C_RED;
+
+constexpr uint_fast8_t RGB5_MAX = (1 << 5) - 1;
+static uint_fast8_t red = RGB5_MAX;
+static uint_fast8_t green = 0;
+static uint_fast8_t blue = 0;
+
+static int update(void)
+{
+    for(auto ev = pollevent(); ev.type != KEYEV_NONE; ev = pollevent()) {
+        if(ev.type == KEYEV_UP && ev.key == KEY_EXIT) {
+            return 1;
+        }
+    }
+
+    if(red == RGB5_MAX && blue == 0) {
+        green++;
+    }
+    if(green == RGB5_MAX && blue == 0) {
+        red--;
+    }
+    if(green == RGB5_MAX && red == 0) {
+        blue++;
+    }
+    if(blue == RGB5_MAX && red == 0) {
+        green--;
+    }
+    if(blue == RGB5_MAX && green == 0) {
+        red++;
+    }
+    if(red == RGB5_MAX && green == 0) {
+        if(blue > 0) {
+            blue--;
+        }
+        else {
+            green++;
+        }
+    }
+
+    color = C_RGB(red, green, blue);
+    return 0;
+}
+
+static uint32_t last_cmdgen = 0;
+
+static void renderer(void)
+{
+    azrp_clear(0xa534);
+
+    azrp_triangle(
+        azrp_width / 2 - 200 / 2, azrp_height / 2 - 200 / 2,
+        azrp_width / 2 + 200 / 2, azrp_height / 2 - 200 / 2,
+        azrp_width / 2 - 200 / 2, azrp_height / 2 + 200 / 2,
+        color
+    );
+
+    azrp_print(3, 10, 0x3811, "cmdgen: %.3Dms", last_cmdgen);
+    azrp_print(3, 25, 0x3811, "sort: %.3Dms", prof_time(azrp_perf_sort));
+    azrp_print(3, 40, 0x3811, "shaders: %.3Dms", prof_time(azrp_perf_shaders));
+    azrp_print(3, 55, 0x3811, "lcd: %.3Dms", prof_time(azrp_perf_lcd));
+    azrp_print(3, 70, 0x3811, "render: %.3Dms", prof_time(azrp_perf_render));
+
+    last_cmdgen = prof_time(azrp_perf_cmdgen);
+    azrp_perf_clear();
+    azrp_update();
+}
+
+int main(void)
+{
+    prof_init();
+    __printf_enable_fixed();
+
+    azrp_config_scale(1);
+    azrp_cmdq_setup(AZRP_CMDQ_DEFAULT_INDEX_SIZE, AZRP_CMDQ_DEFAULT_DATA_SIZE);
+    azrp_perf_clear();
+
+    azur_main_loop(renderer, 30, update, 30, AZUR_MAIN_LOOP_TIED);
+    return 0;
+}
+```
+
+## Build it
+
+Build the ClassPad version with:
+
+```bash
+fxsdk build-cp
+```
+
+Copy the generated `.hh3` file to the root of your calculator storage, next to `run.bin`, then launch it from Hollyhock Launcher.
+
+## Going further
+
+The `waterjam` demo uses the same renderer with a larger project structure. It keeps drawing helpers in separate files, uses `azrp_print()` for counters, and registers a custom shader for its fullscreen map.
+
+For a first Azur app, start with the built-in drawing functions. Custom shaders are useful later when a game draws a lot of repeated data, such as a tile map.
+

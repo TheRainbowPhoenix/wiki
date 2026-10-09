@@ -1,0 +1,129 @@
+---
+title: Renderer Reference
+description: Quick reference for Azur's gint renderer
+sidebar:
+  order: 2
+---
+
+# Azur Renderer Reference
+
+Include the ClassPad renderer with:
+
+```c
+#include <azur/gint/render.h>
+```
+
+If you use `azur_main_loop()`, also include:
+
+```cpp
+#include <azur/azur.h>
+```
+
+## Frame flow
+
+Azur records drawing commands. A normal frame looks like this:
+
+```c
+azrp_clear(C_BLACK);
+azrp_rect(20, 30, 120, 40, C_BLUE);
+azrp_text(20, 90, C_WHITE, "Hello");
+azrp_update();
+```
+
+`azrp_update()` sorts the command queue, renders the fragments, sends them to the screen, then clears the queue for the next frame.
+
+## Setup
+
+| Function | Use |
+| --- | --- |
+| `azrp_config_scale(int scale)` | Set the renderer scale. Use `1` for full ClassPad resolution. |
+| `azrp_cmdq_setup(int index_size, int data_size)` | Allocate the command queue. The default sizes are usually enough for small demos. |
+| `azrp_config_frag_offset(int offset)` | Shift fragment alignment on the Y axis. This is mostly useful for tile maps. |
+
+Default queue sizes:
+
+```c
+AZRP_CMDQ_DEFAULT_INDEX_SIZE
+AZRP_CMDQ_DEFAULT_DATA_SIZE
+```
+
+## Drawing
+
+| Function | Use |
+| --- | --- |
+| `azrp_clear(uint16_t color)` | Clear the frame with one color. |
+| `azrp_rect(int x, int y, int width, int height, int color_or_effect)` | Draw a filled rectangle. |
+| `azrp_triangle(int x1, int y1, int x2, int y2, int x3, int y3, int color)` | Draw a filled triangle. |
+| `azrp_line(int x1, int y1, int x2, int y2, int color)` | Draw a line. |
+| `azrp_text(int x, int y, int fg, char const *str)` | Draw text, like `dtext()`. |
+| `azrp_print(int x, int y, int fg, char const *fmt, ...)` | Draw formatted text. |
+| `azrp_image(int x, int y, bopti_image_t const *image)` | Draw a full image. |
+| `azrp_subimage(int x, int y, bopti_image_t const *image, int left, int top, int width, int height, int flags)` | Draw part of an image. |
+
+`azrp_rect()` can also apply effects instead of a normal color:
+
+```c
+AZRP_RECT_INVERT
+AZRP_RECT_DARKEN
+AZRP_RECT_WHITEN
+```
+
+## Performance counters
+
+Azur exposes counters that can help you understand where frame time is spent.
+
+| Counter | Meaning |
+| --- | --- |
+| `azrp_perf_cmdgen` | Time spent creating commands. |
+| `azrp_perf_sort` | Time spent sorting commands by fragment. |
+| `azrp_perf_shaders` | Time spent running fragment shaders. |
+| `azrp_perf_lcd` | Time spent sending pixels to the LCD. |
+| `azrp_perf_render` | Total render time for shaders, LCD transfer, and render overhead. |
+
+Clear the counters before measuring the next frame:
+
+```c
+azrp_perf_clear();
+```
+
+Read them with `prof_time()`:
+
+```c
+azrp_print(3, 25, C_WHITE, "sort: %.3Dms", prof_time(azrp_perf_sort));
+```
+
+Call `__printf_enable_fixed()` once before using the `%.3D` format.
+
+## Main loop
+
+Azur provides a C++ main loop helper:
+
+```cpp
+azur_main_loop(renderer, 30, update, 30, AZUR_MAIN_LOOP_TIED);
+```
+
+The renderer callback draws a frame and calls `azrp_update()`. The update callback reads input and updates game state. If the update callback returns a non-zero value, the loop stops.
+
+Useful flags:
+
+| Flag | Use |
+| --- | --- |
+| `AZUR_MAIN_LOOP_TIED` | Run update before render. Good default for simple games. |
+| `AZUR_MAIN_LOOP_UNLIMITED` | Run as fast as possible on `gint`. |
+
+## Custom shaders
+
+Most apps should start with the built-in drawing functions. For advanced rendering, Azur can register custom shaders:
+
+```c
+int shader_id = azrp_register_shader(program, configure);
+azrp_set_uniforms(shader_id, uniforms);
+```
+
+Custom commands are queued with:
+
+```c
+void *command = azrp_cmdq_command(size, first_fragment, fragment_count);
+```
+
+Use `azrp_config_get_lines()` to know which fragments a vertical range touches. This is useful for maps and other large repeated data.
