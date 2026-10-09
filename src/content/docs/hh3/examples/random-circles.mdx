@@ -1,0 +1,261 @@
+---
+title: Random Circles
+description: Draw circles where the screen is touched using the HollyHock3 SDK.
+sidebar:
+  order: 3
+---
+
+In this tutorial, you'll make a small drawing app: tap the screen, and it draws a colored circle at that position.
+
+This is a good first touch example because the app only does three things:
+- Wait for an input event
+- If the event is a screen tap, draw something there
+- If the event is a key press, react to it
+
+## Step 1: Include the SDK headers
+
+Start with the files needed for input, drawing, and memory helpers:
+
+```cpp
+#include <appdef.h>
+#include <sdk/os/input.h>
+#include <sdk/os/lcd.h>
+#include <sdk/os/mem.h>
+#include <sdk/calc/calc.h>
+```
+
+Here is what each one is for:
+- `appdef.h` defines the app name and description shown in the launcher.
+- `input.h` gives `Input_Event` and `GetInput`.
+- `lcd.h` gives `LCD_ClearScreen`, `LCD_Refresh`, and the `vram` screen buffer.
+- `mem.h` gives `Mem_Memset`, used to reset the event data before reading input.
+- `calc.h` gives screen values like `width` and `height`.
+
+## Step 2: Add app metadata
+
+Add this just after the includes:
+
+```cpp
+APP_NAME("Random Circles (VRAM Test)")
+APP_DESCRIPTION("Draw random circles at tapped locations on the display.")
+APP_AUTHOR("The6P4C")
+APP_VERSION("1.0.0")
+```
+
+You can change the name and author for your own apps.
+
+## Step 3: Make one pixel easy to address
+
+The LCD buffer is a flat array, but screens are easier to think about as `(x, y)` coordinates.
+
+This macro converts `(x, y)` into the correct `vram` position:
+
+```cpp
+#define PIXEL(x, y) (vram[(x) + (y) * width])
+```
+
+Now `PIXEL(10, 20)` means "the pixel at x=10 and y=20".
+
+## Step 4: Add a simple random-looking value
+
+The demo uses a small LFSR value:
+
+```cpp
+uint16_t lfsr = 0x453A;
+```
+
+It is not important yet to understand the math behind it. In this demo, it is used as both the circle color and the source of the circle radius.
+
+## Step 5: Draw a filled circle
+
+Add a function that receives a center point and a radius:
+
+```cpp
+void drawCircle(unsigned int x0, unsigned int y0, int radius) {
+	for (auto dx = -radius; dx < radius; ++dx) {
+		for (auto dy = -radius; dy < radius; ++dy) {
+			if (dx * dx + dy * dy < radius * radius) {
+				int x = x0 + dx;
+				int y = y0 + dy;
+
+				if (x < 0 || static_cast<unsigned int>(x) > width || y < 0 || static_cast<unsigned int>(y) > height) {
+					continue;
+				}
+
+				PIXEL(x, y) = lfsr;
+			}
+		}
+	}
+}
+```
+
+The two loops scan a square around the tap point. The `dx * dx + dy * dy` check keeps only the pixels inside the circle.
+
+The bounds check is important. It prevents drawing outside the screen when the user taps near an edge.
+
+## Step 6: Start the app
+
+Inside `main()`, create an event variable and clear the screen:
+
+```cpp
+int main() {
+	struct Input_Event event;
+
+	LCD_ClearScreen();
+	LCD_Refresh();
+
+	bool running = true;
+	while (running) {
+		// input handling goes here
+	}
+
+	return 0;
+}
+```
+
+`LCD_ClearScreen()` changes the buffer. `LCD_Refresh()` sends the buffer to the real screen.
+
+## Step 7: Wait for input
+
+Inside the `while` loop, reset the event, then wait for input:
+
+```cpp
+Mem_Memset(&event, 0, sizeof(event));
+GetInput(&event, 0xFFFFFFFF, 0x10);
+```
+
+`GetInput()` fills `event` with the next key, touch, or timer event.
+
+## Step 8: Handle keys
+
+First handle key events:
+
+```cpp
+case EVENT_KEY:
+	switch (event.data.key.keyCode) {
+	case KEYCODE_POWER_CLEAR:
+		running = false;
+		break;
+	case KEYCODE_0:
+		LCD_ClearScreen();
+		LCD_Refresh();
+		break;
+	default:
+		break;
+	}
+	break;
+```
+
+Press `0` to clear the screen. Press `Clear` to quit.
+
+## Step 9: Handle touch events
+
+For a touch event, read the point, draw a circle, update the LFSR, then refresh:
+
+```cpp
+case EVENT_TOUCH: {
+	int32_t x = event.data.touch_single.p1_x;
+	int32_t y = event.data.touch_single.p1_y;
+
+	if (x < 0 || static_cast<unsigned int>(x) > width || y < 0 || static_cast<unsigned int>(y) > height) {
+		break;
+	}
+
+	uint16_t radius = (lfsr ^ (lfsr >> 4) ^ (lfsr >> 8) ^ (lfsr >> 12)) & 0xF;
+	drawCircle(x, y, radius + 10);
+
+	uint16_t bit = ((lfsr >> 0) ^ (lfsr >> 2) ^ (lfsr >> 3) ^ (lfsr >> 5)) & 1;
+	lfsr = (lfsr >> 1) | (bit << 15);
+
+	LCD_Refresh();
+	break;
+}
+```
+
+At this point, you have the whole app. The final code below puts all the pieces together.
+
+## Final Code
+
+```cpp
+#include <appdef.h>
+#include <sdk/os/input.h>
+#include <sdk/os/lcd.h>
+#include <sdk/os/mem.h>
+#include <sdk/calc/calc.h>
+
+APP_NAME("Random Circles (VRAM Test)")
+APP_DESCRIPTION("Draw random circles at tapped locations on the display.")
+APP_AUTHOR("The6P4C")
+APP_VERSION("1.0.0")
+
+#define PIXEL(x, y) (vram[(x) + (y) * width])
+
+uint16_t lfsr = 0x453A;
+
+void drawCircle(unsigned int x0, unsigned int y0, int radius) {
+	for (auto dx = -radius; dx < radius; ++dx) {
+		for (auto dy = -radius; dy < radius; ++dy) {
+			if (dx * dx + dy * dy < radius * radius) {
+				int x = x0 + dx;
+				int y = y0 + dy;
+
+				if (x < 0 || static_cast<unsigned int>(x) > width || y < 0 || static_cast<unsigned int>(y) > height) {
+					continue;
+				}
+
+				PIXEL(x, y) = lfsr;
+			}
+		}
+	}
+}
+
+int main() {
+	struct Input_Event event;
+
+	LCD_ClearScreen();
+	LCD_Refresh();
+
+	bool running = true;
+	while (running) {
+		Mem_Memset(&event, 0, sizeof(event));
+		GetInput(&event, 0xFFFFFFFF, 0x10);
+
+		switch (event.type) {
+			case EVENT_KEY:
+				switch (event.data.key.keyCode) {
+				case KEYCODE_POWER_CLEAR:
+					running = false;
+					break;
+				case KEYCODE_0:
+					LCD_ClearScreen();
+					LCD_Refresh();
+					break;
+				default:
+					break;
+				}
+				break;
+			case EVENT_TOUCH: {
+				int32_t x = event.data.touch_single.p1_x;
+				int32_t y = event.data.touch_single.p1_y;
+
+				if (x < 0 || static_cast<unsigned int>(x) > width || y < 0 || static_cast<unsigned int>(y) > height) {
+					break;
+				}
+
+				uint16_t radius = (lfsr ^ (lfsr >> 4) ^ (lfsr >> 8) ^ (lfsr >> 12)) & 0xF;
+				drawCircle(x, y, radius + 10);
+
+				uint16_t bit = ((lfsr >> 0) ^ (lfsr >> 2) ^ (lfsr >> 3) ^ (lfsr >> 5)) & 1;
+				lfsr = (lfsr >> 1) | (bit << 15);
+
+				LCD_Refresh();
+				break;
+			}
+			default:
+				break;
+		}
+	}
+	
+	return 0;
+}
+```
