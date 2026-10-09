@@ -1,0 +1,16 @@
+---
+title: "MPU: KEYSC"
+description: "Key Scan Controller"
+---
+
+## Macros
+
+```c
+#define SH7305_KEYSC (*(sh7305_keysc_t *)0xa44b0000)
+```
+
+## Types
+
+```c
+typedef volatile struct { uint16_t KIUDATA[6]; uint16_t KIUCNTREG; uint16_t KIAUTOFIXREG; uint16_t KIUMODEREG; uint16_t KIUSTATEREG; uint16_t KIUINTREG; uint16_t KIUWSETREG; uint16_t KIUINTERVALREG; uint16_t KOUTPINSET; uint16_t KINPINSET; } GPACKED(4) sh7305_keysc_t
+```

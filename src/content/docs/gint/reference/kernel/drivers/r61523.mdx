@@ -1,0 +1,45 @@
+---
+title: "Driver: r61523"
+description: "Reneses R61523 driver"
+---
+
+
+This driver is used to control the 16-bit color LCD of the fx-CP 400.
+
+## Functions
+
+### `r61523_display`
+
+```c
+void r61523_display(uint16_t *vram)
+```
+
+---
+
+### `r61523_display_rect`
+
+r61523_display_rect(): Update a rectangle (both bounds included).
+
+```c
+void r61523_display_rect( uint16_t *vram, int xmin, int xmax, int ymin, int ymax)
+```
+
+---
+
+### `r61523_win_set`
+
+r61523_win_set(): Set the display window
+
+```c
+void r61523_win_set(int x1, int x2, int y1, int y2)
+```
+
+---
+
+### `r61523_set_pixel`
+
+r61523_set_pixel(): Write a pixel directly to DD (slow)
+
+```c
+void r61523_set_pixel(int x, int y, int color)
+```

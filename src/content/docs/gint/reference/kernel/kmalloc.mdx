@@ -1,0 +1,156 @@
+---
+title: "kmalloc"
+description: "gint's memory allocator"
+---
+
+## Functions
+
+### `kmalloc`
+
+```c
+void *kmalloc(size_t size, char const *arena_name)
+```
+
+---
+
+### `krealloc`
+
+krealloc(): Reallocate memory
+This function acts like realloc(). It only tries to reallocate the block in
+the arena where it was previously allocated. Note that if NULL is returned,
+the user needs to have a copy of the original address or the memory will
+become unreachable.
+
+@ptr   Existing allocated block
+@size  New requested size for the block
+Returns address of reallocated block, NULL on error.
+
+```c
+void *krealloc(void *ptr, size_t size)
+```
+
+---
+
+### `kfree`
+
+kfree(): Free memory allocated with kalloc()
+
+```c
+void kfree(void *ptr)
+```
+
+---
+
+### `kmalloc_max`
+
+kmalloc_max(): Allocate the largest block available in an arena
+
+This function is like kmalloc(), but it find the largest block in the arena
+and returns it whole after setting its size in *size. This is useful if you
+need memory to manage with another allocator, or you don't yet know the size
+of the data to be generated. The block can later be shrunk with realloc().
+
+Currently only gint-managed arenas support this operation.
+
+@size        Will be set to size of returned block (if there is one)
+@arean_name  Name of arena to allocate in (*cannot* be NULL)
+Returns the address of the largest block available, NULL on error.
+
+```c
+void *kmalloc_max(size_t *size, char const *arena_name)
+```
+
+---
+
+### `kmalloc_init_arena`
+
+kmalloc_init_arena(): Initialize an arena with gint's allocator
+
+This function initializes an arena on the region located between (a->start)
+and (a->end) and initializes the data structures for gint's allocator. It
+only sets the malloc(), realloc(), free() and (data) attributes of the
+structure, everything else should be initialized manually. The arena must
+have at least 256 bytes.
+
+```c
+void kmalloc_init_arena(kmalloc_arena_t *a, bool enable_statistics)
+```
+
+---
+
+### `kmalloc_add_arena`
+
+kmalloc_add_arena(): Add a new arena to the heap source
+Adds a fully-initialized arena to the heap source. The priority of the new
+arena compared to other default arenas is not specified. Returns true on
+success, false if the maximum number of arenas has been reached.
+
+```c
+bool kmalloc_add_arena(kmalloc_arena_t *arena)
+```
+
+---
+
+### `kmalloc_remove_arena`
+
+kmalloc_remove_arena(): Remove an arena from the heap source
+Removes an arena from the heap source. The arena should certainly be empty,
+although this function will not check that.
+
+```c
+void kmalloc_remove_arena(kmalloc_arena_t *arena)
+```
+
+---
+
+### `kmalloc_init`
+
+kmalloc_init(): Initialize the dynamic allocator
+
+```c
+void kmalloc_init(void)
+```
+
+---
+
+### `kmalloc_get_arena`
+
+kmalloc_get_arena(): Find an arena by name
+
+```c
+kmalloc_arena_t *kmalloc_get_arena(char const *name)
+```
+
+---
+
+### `kmalloc_get_gint_stats`
+
+kmalloc_get_gint_stats(): Get gint statistics for an arena
+
+Returns a pointer to the arena's statistics; returns NULL if the arena is
+not managed by gint's allocator or statistics were not enabled.
+
+```c
+kmalloc_gint_stats_t *kmalloc_get_gint_stats(kmalloc_arena_t *arena)
+```
+
+## Types
+
+```c
+typedef struct { /* Functions managing the arena. The last argument is the [data] attribute in this structure. */ /* kmalloc() handles size == 0 */ void * (*malloc)(size_t size, void *data); /* krealloc() handles ptr == NULL, as well as newsize == 0 */ void * (*realloc)(void *ptr, size_t newsize, void *data); /* kfree() handles ptr == NULL*/ void (*free)(void *ptr, void *data); /* kmalloc_max() backend */ void * (*malloc_max)(size_t *size, void *data); /* Name, should be unique; gint reserves names starting with "_" */ char const *name; /* Start and end of arena. This is used to find the proper arena to free from in kfree(). This cannot be NULL except for the OS heap as the exact addresses are unknown. */ void *start, *end; /* Pointer to arena-provided data, passed to malloc() and free() */ void *data; /* Whether to consider this arena when performing default allocations (kmalloc() with arena_name == NULL) */ int is_default; /* Statistics maintained by kmalloc() */ struct kmalloc_stats { int live_blocks; int peak_live_blocks; int total_volume; int total_blocks; int total_failures; } stats; } kmalloc_arena_t
+```
+
+kmalloc_gint_stats_t: Optional statistics for gint's allocator
+
+These statistics are tracked by gint's allocator if requested when the arena
+is created. They can't be added or removed after creation.
+
+The free memory and used memory are counted in data bytes. Because the
+allocator uses some data, the initial value of (free_memory) is less than
+the size of the region. Additionally, because each used or free block has a
+4-byte header, (free_memory + used_memory) is not a constant value, so don't
+expect to get exactly what these values indicate (also fragmentation).
+
+```c
+typedef struct { /* Free space, used space, peak used space over time */ uint32_t free_memory; uint32_t used_memory; uint32_t peak_used_memory; /* Number of mallocs that failed because of not enough free space */ int exhaustion_failures; /* Number of mallocs that failed because of fragmentation */ int fragmentation_failures; /* Number of reallocs that successfully re-used the same location */ int expanding_reallocs; /* Number of reallocs that moved the data around */ int relocating_reallocs; } kmalloc_gint_stats_t
+```

@@ -1,0 +1,132 @@
+---
+title: Kernel API
+description: Reference for the gint kernel API on ClassPad
+sidebar:
+  order: 0
+---
+
+This is the API reference for the **gint kernel headers**, generated from the gint source for the ClassPad port (target **fxCP**, the fx-CP400). Pages are generated directly from the headers with preprocessor conditions resolved for the ClassPad, so only APIs that exist on this platform are listed.
+
+Hardware that only exists on other models is not covered here (fx-9860G and fx-CG 50 only: `display-fx`, `gray`, the `t6k11` and `r61524` drivers). Those headers are excluded from generation.
+
+:::note[Unofficial documentation]
+These are unofficial docs, written and maintained by the community until gint publishes its official documentation. They are valid for the ClassPad port, but they may be slightly outdated, and they only cover the ClassPad, while gint also works on other calculators.
+:::
+
+## Core Modules
+
+- [gint](/wiki/gint/reference/kernel/gint/) - gint
+- [Hardware](/wiki/gint/reference/kernel/hardware/) - Hardware
+- [CPU](/wiki/gint/reference/kernel/cpu/) - CPU
+- [Clock](/wiki/gint/reference/kernel/clock/) - Clock
+- [Timer](/wiki/gint/reference/kernel/timer/) - Timer
+- [Profiling](/wiki/gint/reference/kernel/prof/) - Profiling
+
+## Display and Graphics
+
+- [Display](/wiki/gint/reference/kernel/display/) - Display
+- [Display: fx-CG 50](/wiki/gint/reference/kernel/display-cg/) - Display: fx-CG 50
+- [Image](/wiki/gint/reference/kernel/image/) - Image
+- [Video](/wiki/gint/reference/kernel/video/) - Video
+
+## Input
+
+- [Keyboard](/wiki/gint/reference/kernel/keyboard/) - Keyboard
+- [Keycodes](/wiki/gint/reference/kernel/keycodes/) - Keycodes
+- [Driver: iokbd](/wiki/gint/reference/kernel/drivers/iokbd/) - Driver: iokbd
+
+## Memory Management
+
+- [kmalloc](/wiki/gint/reference/kernel/kmalloc/) - kmalloc
+- [MMU](/wiki/gint/reference/kernel/mmu/) - MMU
+- [Driver: states](/wiki/gint/reference/kernel/drivers/states/) - Driver: states
+
+## File System
+
+- [Filesystem](/wiki/gint/reference/kernel/fs/) - Filesystem
+- [BFile](/wiki/gint/reference/kernel/bfile/) - BFile
+
+## Drivers
+
+- [Drivers](/wiki/gint/reference/kernel/drivers/) - Drivers
+- [Driver: asyncio](/wiki/gint/reference/kernel/drivers/asyncio/) - Driver: asyncio
+- [Driver: keydev](/wiki/gint/reference/kernel/drivers/keydev/) - Driver: keydev
+- [Driver: r61523](/wiki/gint/reference/kernel/drivers/r61523/) - Driver: r61523
+- [Driver: touch](/wiki/gint/reference/kernel/drivers/touch/) - Driver: touch
+
+## MPU (Microprocessor Unit)
+
+- [MPU: BSC](/wiki/gint/reference/kernel/mpu/bsc/) - MPU: BSC
+- [MPU: CPG](/wiki/gint/reference/kernel/mpu/cpg/) - MPU: CPG
+- [MPU: DMA](/wiki/gint/reference/kernel/mpu/dma/) - MPU: DMA
+- [MPU: FSI](/wiki/gint/reference/kernel/mpu/fsi/) - MPU: FSI
+- [MPU: I2C](/wiki/gint/reference/kernel/mpu/i2c/) - MPU: I2C
+- [MPU: INTC](/wiki/gint/reference/kernel/mpu/intc/) - MPU: INTC
+- [MPU: KEYSC](/wiki/gint/reference/kernel/mpu/keysc/) - MPU: KEYSC
+- [MPU: MMU](/wiki/gint/reference/kernel/mpu/mmu/) - MPU: MMU
+- [MPU: PFC](/wiki/gint/reference/kernel/mpu/pfc/) - MPU: PFC
+- [MPU: power](/wiki/gint/reference/kernel/mpu/power/) - MPU: power
+- [MPU: RTC](/wiki/gint/reference/kernel/mpu/rtc/) - MPU: RTC
+- [MPU: SCIF](/wiki/gint/reference/kernel/mpu/scif/) - MPU: SCIF
+- [MPU: SPU](/wiki/gint/reference/kernel/mpu/spu/) - MPU: SPU
+- [MPU: TMU](/wiki/gint/reference/kernel/mpu/tmu/) - MPU: TMU
+- [MPU: UBC](/wiki/gint/reference/kernel/mpu/ubc/) - MPU: UBC
+- [MPU: USB](/wiki/gint/reference/kernel/mpu/usb/) - MPU: USB
+- [MPU: WDT](/wiki/gint/reference/kernel/mpu/wdt/) - MPU: WDT
+
+## USB
+
+- [USB](/wiki/gint/reference/kernel/usb/) - USB
+- [USB: FF-Bulk](/wiki/gint/reference/kernel/usb-ff-bulk/) - USB: FF-Bulk
+
+## System Utilities
+
+- [DMA](/wiki/gint/reference/kernel/dma/) - DMA
+- [INTC](/wiki/gint/reference/kernel/intc/) - INTC
+- [RTC](/wiki/gint/reference/kernel/rtc/) - RTC
+- [Serial](/wiki/gint/reference/kernel/serial/) - Serial
+- [UBC](/wiki/gint/reference/kernel/ubc/) - UBC
+- [Exceptions](/wiki/gint/reference/kernel/exc/) - Exceptions
+- [GDB](/wiki/gint/reference/kernel/gdb/) - GDB
+
+## Type Definitions and Utilities
+
+- [Defs: types](/wiki/gint/reference/kernel/defs/types/) - Defs: types
+- [Defs: attributes](/wiki/gint/reference/kernel/defs/attributes/) - Defs: attributes
+- [Defs: GINT_CALL](/wiki/gint/reference/kernel/defs/call/) - Defs: GINT_CALL
+- [Defs: timeout](/wiki/gint/reference/kernel/defs/timeout/) - Defs: timeout
+- [Defs: util](/wiki/gint/reference/kernel/defs/util/) - Defs: util
+
+## Other
+
+- [Touch](/wiki/gint/reference/kernel/touch/) - Touch
+
+## JustUI Framework
+
+The [JustUI widget library](/wiki/gint/reference/libraries/justui/) has its own reference section:
+
+- [defs](/wiki/gint/reference/libraries/justui/defs/) - JustUI definitions
+- [jbutton](/wiki/gint/reference/libraries/justui/jbutton/) - Button widget
+- [jevent](/wiki/gint/reference/libraries/justui/jevent/) - Event system
+- [jfileselect](/wiki/gint/reference/libraries/justui/jfileselect/) - File selection dialog
+- [jfkeys](/wiki/gint/reference/libraries/justui/jfkeys/) - Function keys
+- [jframe](/wiki/gint/reference/libraries/justui/jframe/) - Main window frame
+- [jinput](/wiki/gint/reference/libraries/justui/jinput/) - Input widget
+- [jlabel](/wiki/gint/reference/libraries/justui/jlabel/) - Label widget
+- [jlayout](/wiki/gint/reference/libraries/justui/jlayout/) - Layout management
+- [jlist](/wiki/gint/reference/libraries/justui/jlist/) - List widget
+- [jpainted](/wiki/gint/reference/libraries/justui/jpainted/) - Painted widget
+- [jscene](/wiki/gint/reference/libraries/justui/jscene/) - Scene management
+- [jscrolledlist](/wiki/gint/reference/libraries/justui/jscrolledlist/) - Scrolled list widget
+- [jwidget](/wiki/gint/reference/libraries/justui/jwidget/) - Base widget class
+- [jwidget API](/wiki/gint/reference/libraries/justui/jwidget-api/) - Widget API reference
+- [preproc](/wiki/gint/reference/libraries/justui/p/preproc/) - Preprocessing utilities
+- [vec](/wiki/gint/reference/libraries/justui/p/vec/) - Vector utilities
+
+## Build System
+
+- [Linker Script Guide](/wiki/gint/reference/kernel/linker/) - Memory layout and section organization
+
+## Repository
+
+Source code: [ClasspadDev/gint](https://github.com/ClasspadDev/gint)

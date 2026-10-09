@@ -1,0 +1,60 @@
+---
+title: "Defs: util"
+description: "Various utility macros"
+---
+
+## Macros
+
+### `synco`
+
+synco instruction (in a form compatible with sh3eb-elf)
+
+```c
+#define synco (()) __asm__ volatile (".word 0x00ab":::"memory")
+```
+
+### `min`
+
+min(), max() (without double evaluation)
+
+```c
+#define min ((a, b)) ({			\
+	GAUTOTYPE _a = (a);		\
+	GAUTOTYPE _b = (b);		\
+	_a < _b ? _a : _b;		\
+})
+```
+
+### `sgn`
+
+sgn() (without double evaluation)
+
+```c
+#define sgn ((s)) ({			\
+	GAUTOTYPE _s = (s);		\
+	_s < 0 ? -1 :			\
+	_s > 0 ? +1 :			\
+	0;				\
+})
+```
+
+### `swap`
+
+swap() - exchange two variables of the same type
+
+```c
+#define swap ((a, b)) ({			\
+	GAUTOTYPE _tmp = (a);		\
+	(a) = (b);			\
+	(b) = _tmp;			\
+})
+```
+
+```c
+#define GAUTOTYPE __auto_type
+#define max ((a, b)) ({			\
+	GAUTOTYPE _a = (a);		\
+	GAUTOTYPE _b = (b);		\
+	_a > _b ? _a : _b;		\
+})
+```

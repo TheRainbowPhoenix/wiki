@@ -1,0 +1,137 @@
+---
+title: "Profiling"
+description: "prof: A manual profiling interface for gint"
+---
+
+## Functions
+
+### `prof_init`
+
+Don't use if libprof was included.
+
+```c
+int prof_init(void)
+```
+
+---
+
+### `prof_quit`
+
+prof_quit(): Free the profiler's timer
+
+```c
+void prof_quit(void)
+```
+
+---
+
+### `prof_time`
+
+prof_time(): Time spent in a given context, in microseconds
+Should only be called when the context is not currently executing.
+
+```c
+uint32_t prof_time(prof_t prof)
+```
+
+## Macros
+
+### `LIBPROF_LIBPROF`
+
+This provides the old interface for \<libprof.h>.
+
+```c
+#define LIBPROF_LIBPROF
+```
+
+### `LIBPROF_VERSION`
+
+Advertise libprof version as gint's version.
+
+```c
+#define LIBPROF_VERSION GINT_VERSION
+```
+
+### `prof_make`
+
+prof_make(): Create a new context object
+A context can be cleared by assigning it prof_make() again.
+
+```c
+#define prof_make (()) ((prof_t){ 0, 0 })
+```
+
+### `prof_enter`
+
+prof_enter(): Start counting time for a function
+This macro should be called at the start of the context scope. If the
+function was already executing then the deepest instance in the stack is
+used instead of creating a new counter.
+
+```c
+#define prof_enter ((prof)) {				\
+	if(!(prof).rec++) (prof).elapsed += *prof_tcnt;	\
+}
+```
+
+### `prof_leave`
+
+prof_leave(): Stop counting time for a function
+This should be called at the end of the context scope; it only actually
+stops if there is no deeper instance of the context in the stack. If there
+are not as exactly as many prof_leave()'s as prof_enter()'s then the
+resulting time measure will not be relevant at all.
+
+```c
+#define prof_leave ((prof)) {				\
+	if(!--(prof).rec) (prof).elapsed -= *prof_tcnt;	\
+}
+```
+
+### `prof_enter_norec`
+
+Variant of prof_enter()/prof_leave() for non-recursive contexts
+
+```c
+#define prof_enter_norec ((prof)) {			\
+	(prof).elapsed += *prof_tcnt;			\
+}
+```
+
+### `prof_exec`
+
+prof_exec(): Measure a single block of code
+This operation can be used when profiling is not required, and instead
+used to measure the performance of a single bit of code.
+Use it like this:
+
+uint32_t elasped_us = prof_exec(\{
+exec_code();
+\});
+
+```c
+#define prof_exec ((code)) ({		\
+	prof_t _prof = prof_make();	\
+	prof_enter(_prof);		\
+	code;				\
+	prof_leave(_prof);		\
+	prof_time(_prof);		\
+})
+```
+
+```c
+#define prof_leave_norec ((prof)) {			\
+	(prof).elapsed -= *prof_tcnt;			\
+}
+```
+
+## Types
+
+Context object, has an elasped delay and a recursion level. This object can
+be created on the stack of a function that measures its execution time,
+except if the function is recursive, in which case it should be either
+static or global.
+
+```c
+typedef struct prof_t { uint32_t rec; uint32_t elapsed; } GPACKED(4) prof_t
+```

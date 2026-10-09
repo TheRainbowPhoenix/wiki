@@ -19,7 +19,7 @@ const makeId = (label: string) => '__tab-' + label.toLowerCase().replaceAll(/\s+
 
 /** Get the icon for a group. Update the icon names in the array to change the icons associated with a group. */
 const getIcon = (index: number) =>
-	(['v2', 'v3', 'python', 'misc'] as const)[index];
+	(['gint', 'v3', 'python', 'misc'] as const)[index];
 
 /** Determine if an array of sidebar items contains the current page.  */
 const isCurrent = (sidebar: SidebarEntry[]): boolean =>

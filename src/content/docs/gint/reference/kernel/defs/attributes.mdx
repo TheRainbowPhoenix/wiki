@@ -1,0 +1,136 @@
+---
+title: "Defs: attributes"
+description: "Macros for compiler-specific attributes"
+---
+
+## Macros
+
+### `GSECTION`
+
+Objects from specific sections
+
+```c
+#define GSECTION ((x)) __attribute__((section(x)))
+```
+
+### `GBSS`
+
+Objects from the gint's uninitialized BSS section
+
+```c
+#define GBSS __attribute__((section(".gint.bss")))
+```
+
+### `GRODATA3`
+
+Additional sections that are only needed on SH3
+
+```c
+#define GRODATA3 __attribute__((section(".gint.rodata.sh3")))
+```
+
+### `GILRAM`
+
+Objects for the ILRAM, XRAM and YRAM regions
+
+```c
+#define GILRAM __attribute__((section(".ilram")))
+```
+
+### `GUNUSED`
+
+Unused parameters or variables
+
+```c
+#define GUNUSED __attribute__((unused))
+```
+
+### `GUSED`
+
+Used parameters or variables but invisible to the compiler
+
+```c
+#define GUSED __attribute__((used))
+```
+
+### `GINLINE`
+
+Functions that *must* be inlined
+
+```c
+#define GINLINE __attribute__((always_inline)) inline
+```
+
+### `GALIGNED`
+
+Aligned variables
+
+```c
+#define GALIGNED ((x)) __attribute__((aligned(x)))
+```
+
+### `GPACKED`
+
+Packed structures. I require explicit alignment because if it's unspecified,
+GCC cannot optimize access size, and reads to memory-mapped I/O with invalid
+access sizes silently fail - honestly you don't want this to happen
+
+```c
+#define GPACKED ((x)) __attribute__((packed, aligned(x)))
+```
+
+### `GPACKEDENUM`
+
+Packed enumerations
+
+```c
+#define GPACKEDENUM __attribute__((packed))
+```
+
+### `GTRANSPARENT`
+
+Transparent unions
+
+```c
+#define GTRANSPARENT __attribute__((transparent_union))
+```
+
+### `GVISIBLE`
+
+Functions and globals that are visible through whole-program optimization
+
+```c
+#define GVISIBLE __attribute__((externally_visible))
+```
+
+### `GWEAK`
+
+Weak symbols
+
+```c
+#define GWEAK __attribute__((weak))
+```
+
+### `GCONSTRUCTOR`
+
+Constructors
+
+```c
+#define GCONSTRUCTOR __attribute__((constructor))
+```
+
+### `GNORETURN`
+
+Functions that do not return
+
+```c
+#define GNORETURN __attribute__((noreturn))
+```
+
+```c
+#define GDATA3 __attribute__((section(".gint.data.sh3")))
+#define GBSS3 __attribute__((section(".gint.bss.sh3")))
+#define GXRAM __attribute__((section(".xyram")))
+#define GYRAM __attribute__((section(".xyram")))
+#define GDESTRUCTOR __attribute__((destructor))
+```

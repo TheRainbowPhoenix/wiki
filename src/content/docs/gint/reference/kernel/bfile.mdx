@@ -1,0 +1,66 @@
+---
+title: "BFile"
+description: "BFile interface"
+---
+
+
+BFile is the OS's native interface to the filesystem. It has quite a bit of
+legacy, so it's not very easy to use. Please note that BFile cannot be used
+from within gint, so do a gint_world_switch() (\<gint/gint.h>) to call BFile
+functions; otherwise the add-in is likely to crash.
+
+There are two different filesystems:
+* An older, in-house one made by CASIO and informally called CASIOWIN (which
+is the name of the OS itself), which is incomplete, hard to use, and very
+limiting, but also very fast.
+* A newer one, designed by Kyoto Software Research and called Fugue, which
+is mostly complete and behaves as a regular filesystem, though very slow.
+
+You can detect which one is used by querying gint[HWFS] (\<gint/hardware.h>):
+* HWFS_FUGUE is the newer one; it is found in:
+- The fx-CG series (in France: Prizm and Graph 90+E)
+- The fx G-III series (in France: Graph 35+E II)
+* HWFS_CASIOWIN is the older one; it is found in all older black-and-white
+model that have a storage memory.
+
+Wherever Fugue is used, gint supports the Unix file API (open, read, write,
+etc) and the C99 standard file API (fopen, fread, fwrite, etc), so there is
+no need to call into BFile directly (you should still do a world switch
+before using these functions).
+
+You should only have to use BFile if you're dealing with the CASIOWIN
+filesystem. With Fugue, not only are the Unix/C99 APIs easier to use, but
+the meanings of arguments and return values in BFile calls also change
+compared to the CASIOWIN filesystem, so there's little to gain anyway.
+
+If you're here for the CASIOWIN filesystem, be aware of its limitations. In
+general reading files will work fine; expect no issues with that. Modifying
+files is where things get difficult. Keep the following in mind:
+
+* Non-standard meanings of arguments and return values (eg. BFile_Read()
+returns the number of readable bytes between the new position and EOF).
+* Files must be created with a fixed size indicated in BFile_Create() and
+are initialized with 0xff.
+* A write to a file can only replace 1's with 0's, meaning in practice a
+file can only be written to once. (That's why it's created with 0xff.)
+* All writes must be of even size; writing an odd number of bytes can mess
+up the file and confuse the filesystem.
+* Only one level of folders is supported; attempting to create second-level
+subfolders results in weird recursive directories (don't do that).
+
+File paths in the OS use the non-standard FONTCHARACTER encoding, which is a
+16-bit fixed-width encoding. Most users don't care about special characters;
+in GCC, you can get a 16-bit literal string with the u"" prefix, eg.
+u"\\\\fls0\\data.bin"
+which is what you usually supply as the [uint16_t const *path] argument.
+
+All functions return nonnegative values on success. If no return value is
+described then a successful call returns 0. Unless specified otherwise, all
+functions can also return a negative error code as documented near the end
+of this header.
+
+## Macros
+
+```c
+#define GINT_BFILE
+```

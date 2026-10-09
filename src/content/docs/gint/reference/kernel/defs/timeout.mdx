@@ -1,0 +1,30 @@
+---
+title: "Defs: timeout"
+description: "RTC-based timeouts"
+---
+
+
+This header provides an interface for simplistic timers used for timeout
+waiting. Currently they are based on the RTC with a resolution of 1/128 s.
+
+## Functions
+
+### `timeout_make_ms`
+
+```c
+static inline timeout_t timeout_make_ms(int ms) { return clock() + (int64_t)ms * CLOCKS_PER_SEC / 1000; }
+```
+
+---
+
+### `timeout_elapsed`
+
+```c
+static inline bool timeout_elapsed(timeout_t const *t) { return t && clock() >= *t; }
+```
+
+## Types
+
+```c
+typedef clock_t timeout_t
+```
