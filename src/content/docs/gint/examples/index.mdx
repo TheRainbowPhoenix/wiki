@@ -5,10 +5,16 @@ sidebar:
   order: 0
 ---
 
-:::note[Examples coming soon]
-We want the examples to **exactly match the code**, so they are published **once the content has been fully verified**. Thanks for your patience!
-:::
+This section collects gint examples for the ClassPad. These are not only beginner demos: some examples show lower-level hardware and profiling techniques.
 
-This section will collect **small, self-contained gint example programs** for the ClassPad: rendering demos, keyboard and touchscreen input, timers, and filesystem access — each with the full source code and an explanation of what it does.
+Some examples are adapted from `Lephenixnoir/gintctl` on the Planet Casio git forge. The original program targets several calculators, so the wiki versions are simplified for ClassPad and avoid keys that do not exist on this port. If you need help finding projects on the Planet Casio forge, see the [forge migration post](https://www.planet-casio.com/Fr/forums/topic17716-1-migration-de-la-forge-gitea-en-forgejo.html).
 
-In the meantime, the best places to look are the **templates** ([⛩️ Gint + JustUI Template](https://github.com/TheRainbowPhoenix/USB_test), [gint-template](https://github.com/TheRainbowPhoenix/gint-template)) and the [JustUI tutorial](/wiki/gint/reference/libraries/justui/tutorial/), which builds a complete application from scratch.
+## gintctl examples
+
+- [Render timing](/wiki/gint/examples/gintctl/render-timing/) - Measure drawing and display update time.
+- [Register browser](/wiki/gint/examples/gintctl/register-browser/) - Read hardware registers directly.
+- [Memory peek](/wiki/gint/examples/gintctl/memory-peek/) - Read raw memory with exception guards.
+
+## Templates
+
+For a full starting project, use [gint-template](https://github.com/TheRainbowPhoenix/gint-template). If you want a touch-friendly UI example, use the [Gint + JustUI template](https://github.com/TheRainbowPhoenix/USB_test).

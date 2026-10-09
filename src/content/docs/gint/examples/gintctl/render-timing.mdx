@@ -1,0 +1,118 @@
+---
+title: Render timing
+description: Measure drawing and display update time with gint
+sidebar:
+  order: 1
+---
+
+This advanced example measures how long common rendering calls take. It is inspired by the render performance screen in `Lephenixnoir/gintctl` on the Planet Casio git forge.
+
+The idea is simple: use `prof_make()`, `prof_enter()` and `prof_leave()` around a small operation, then print the elapsed time.
+
+## What it shows
+
+- Measuring CPU time with `gint/prof.h`
+- Comparing `dclear()`, `drect()` and `dupdate()`
+- Keeping the display update measurement separate from drawing
+- Using `KEY_EXE` to run the test again and `KEY_EXIT` to leave
+
+## Full source
+
+```c
+#define FXCP
+#include <gint/display.h>
+#include <gint/keyboard.h>
+#include <gint/prof.h>
+#include <fxlibc/printf.h>
+
+struct results {
+    uint32_t clear;
+    uint32_t rect_small;
+    uint32_t rect_full;
+    uint32_t update;
+};
+
+static uint32_t measure(void (*function)(void))
+{
+    prof_t prof = prof_make();
+
+    prof_enter(prof);
+    function();
+    prof_leave(prof);
+
+    return prof_time(prof);
+}
+
+static void test_clear(void)
+{
+    dclear(C_WHITE);
+}
+
+static void test_rect_small(void)
+{
+    drect(0, 0, 31, 31, C_RGB(20, 20, 20));
+}
+
+static void test_rect_full(void)
+{
+    drect(0, 0, DWIDTH - 1, DHEIGHT - 1, C_RGB(20, 20, 20));
+}
+
+static void run_tests(struct results *r)
+{
+    r->clear = measure(test_clear);
+    r->rect_small = measure(test_rect_small);
+    r->rect_full = measure(test_rect_full);
+
+    dclear(C_WHITE);
+    dtext(8, 8, C_BLACK, "Measuring dupdate...");
+
+    prof_t prof = prof_make();
+    prof_enter(prof);
+    dupdate();
+    prof_leave(prof);
+    r->update = prof_time(prof);
+}
+
+static void draw_results(struct results const *r)
+{
+    dclear(C_WHITE);
+    dtext(8, 8, C_BLACK, "Render timing");
+    dtext(8, 28, C_BLACK, "EXE: run  EXIT: leave");
+
+    dprint(8, 70, C_BLACK, "dclear:       %.3D ms", r->clear);
+    dprint(8, 90, C_BLACK, "drect 32x32:  %.3D ms", r->rect_small);
+    dprint(8, 110, C_BLACK, "drect screen: %.3D ms", r->rect_full);
+    dprint(8, 130, C_BLACK, "dupdate:      %.3D ms", r->update);
+
+    dupdate();
+}
+
+int main(void)
+{
+    struct results r = { 0 };
+
+    prof_init();
+    __printf_enable_fixed();
+    run_tests(&r);
+
+    while(1) {
+        draw_results(&r);
+
+        int key = getkey().key;
+        if(key == KEY_EXIT) {
+            return 1;
+        }
+        if(key == KEY_EXE) {
+            run_tests(&r);
+        }
+    }
+}
+```
+
+## Notes
+
+`prof_time()` returns a fixed-point millisecond value. The `%.3D` format prints it with three decimals after `__printf_enable_fixed()` is called.
+
+`dupdate()` is measured separately because it sends VRAM to the screen. On ClassPad this cost matters a lot for animation-heavy programs.
+

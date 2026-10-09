@@ -16,12 +16,11 @@ For ClassPad builds, define `FXCP` before including gint headers:
 ```cpp
 #define FXCP
 #include <gint/display.h>
-#include "gint/keycodes.h"
+#include <gint/keycodes.h>
 #include <gint/keyboard.h>
-#include <gint/gint.h>
 ```
 
-`display.h` gives drawing functions like `dclear`, `dtext`, and `dupdate`. `keyboard.h` gives `keydown()` and event helpers. `gint.h` gives `gint_osmenu()`.
+`display.h` gives drawing functions like `dclear`, `dtext`, and `dupdate`. `keyboard.h` gives `keydown()` and event helpers.
 
 ## Step 2: Create `main()`
 
@@ -72,24 +71,22 @@ Then check for a key:
 
 ```cpp
 if (keydown(KEY_EXE)) {
-    dtext(1, 40, C_WHITE, "MENU!");
-    gint_osmenu();
+    dtext(1, 40, C_WHITE, "EXE!");
 }
 if (keydown(KEY_EXIT)) {
     return 1;
 }
 ```
 
-On ClassPad, use `KEY_EXE` for an action and `KEY_EXIT` to leave. `gint_osmenu()` opens the gint OS menu.
+On ClassPad, use `KEY_EXE` for an action and `KEY_EXIT` to leave.
 
 ## Final Code
 
 ```cpp
 #define FXCP
 #include <gint/display.h>
-#include "gint/keycodes.h"
+#include <gint/keycodes.h>
 #include <gint/keyboard.h>
-#include <gint/gint.h>
 
 int main() {
     dclear(0x2104);
@@ -100,8 +97,7 @@ int main() {
         dtext(1, 20, C_WHITE, "LOOP!");
         clearevents();
         if (keydown(KEY_EXE)) {
-            dtext(1, 40, C_WHITE, "MENU!");
-            gint_osmenu();
+            dtext(1, 40, C_WHITE, "EXE!");
         }
         if (keydown(KEY_EXIT)) {
             return 1;

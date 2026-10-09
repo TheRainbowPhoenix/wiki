@@ -1,0 +1,67 @@
+---
+title: Register browser
+description: Read hardware registers directly with gint
+sidebar:
+  order: 2
+---
+
+This advanced example reads a few hardware registers and prints their values. It is inspired by the register browser in `Lephenixnoir/gintctl` on the Planet Casio git forge.
+
+Direct register access is useful when debugging drivers, clocks, interrupts, and low-level hardware state. It is also easy to misuse, so this example only reads registers.
+
+## What it shows
+
+- Including `gint/mpu/*` headers
+- Reading interrupt, power and clock registers
+- Reading the CPU cache control register with a volatile pointer
+- Displaying raw hexadecimal values
+
+## Full source
+
+```c
+#define FXCP
+#include <stdint.h>
+#include <gint/display.h>
+#include <gint/keyboard.h>
+#include <gint/mpu/intc.h>
+#include <gint/mpu/power.h>
+#include <gint/mpu/cpg.h>
+
+int main(void)
+{
+    while(1) {
+        dclear(C_WHITE);
+
+        dtext(8, 8, C_BLACK, "Register browser");
+        dtext(8, 28, C_BLACK, "Read-only hardware state");
+        dtext(8, 48, C_BLACK, "Press EXIT to leave");
+
+        dprint(8, 90, C_BLACK, "IPRA: %04x", SH7305_INTC._->IPRA.word);
+        dprint(8, 110, C_BLACK, "IPRB: %04x", SH7305_INTC._->IPRB.word);
+        dprint(8, 130, C_BLACK, "IPRC: %04x", SH7305_INTC._->IPRC.word);
+        dprint(8, 150, C_BLACK, "IPRD: %04x", SH7305_INTC._->IPRD.word);
+
+        dprint(8, 190, C_BLACK, "MSTPCR0: %08X", SH7305_POWER.MSTPCR0.lword);
+        dprint(8, 210, C_BLACK, "MSTPCR2: %08X", SH7305_POWER.MSTPCR2.lword);
+
+        dprint(8, 250, C_BLACK, "FSICLKCR: %08X", SH7305_CPG.FSICLKCR.lword);
+        dprint(8, 270, C_BLACK, "SPUCLKCR: %08X", SH7305_CPG.SPUCLKCR.lword);
+
+        volatile uint32_t *ccr = (void *)0xff00001c;
+        dprint(8, 310, C_BLACK, "CCR: %08X", *ccr);
+
+        dupdate();
+
+        if(getkey().key == KEY_EXIT) {
+            return 1;
+        }
+    }
+}
+```
+
+## Notes
+
+The `gint/mpu` headers expose mapped hardware registers as C structures. This is cleaner than manually hardcoding every address.
+
+Only write to hardware registers when you know what the register does. A wrong write can freeze the calculator.
+

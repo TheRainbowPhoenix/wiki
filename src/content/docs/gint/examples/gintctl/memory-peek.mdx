@@ -1,0 +1,108 @@
+---
+title: Memory peek
+description: Read raw memory with exception guards
+sidebar:
+  order: 3
+---
+
+This advanced example reads raw memory and displays it as hexadecimal bytes. It is inspired by the memory browser in `Lephenixnoir/gintctl` on the Planet Casio git forge.
+
+Some addresses cannot be read. The example installs a temporary exception handler so a bad read can be reported instead of crashing immediately.
+
+## What it shows
+
+- Reading memory through a raw pointer
+- Catching TLB miss and CPU read errors
+- Skipping a faulting instruction with `gint_exc_skip()`
+- Moving through memory with `UP` and `DOWN`
+
+## Full source
+
+```c
+#define FXCP
+#include <stdint.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <gint/display.h>
+#include <gint/keyboard.h>
+#include <gint/exc.h>
+
+static uint32_t exception = 0;
+
+static int catch_memory_exception(uint32_t code)
+{
+    if(code == 0x040 || code == 0x0e0) {
+        exception = code;
+        gint_exc_skip(1);
+        return 0;
+    }
+
+    return 1;
+}
+
+static bool read_byte(uint8_t const *address, uint8_t *value)
+{
+    exception = 0;
+    gint_exc_catch(catch_memory_exception);
+
+    __asm__ volatile("mov.b @%1, %0" : "=r"(*value) : "r"(address));
+
+    gint_exc_catch(NULL);
+    return exception == 0;
+}
+
+static void draw_line(int y, uint32_t address)
+{
+    char bytes[32] = { 0 };
+    char ascii[9] = { 0 };
+
+    for(int i = 0; i < 8; i++) {
+        uint8_t value = 0;
+
+        if(!read_byte((void *)(address + i), &value)) {
+            dprint(8, y, C_BLACK, "%08X: unreadable", address);
+            return;
+        }
+
+        sprintf(bytes + 3 * i, "%02X ", value);
+        ascii[i] = (value >= 0x20 && value < 0x7f) ? value : '.';
+    }
+
+    dprint(8, y, C_BLACK, "%08X: %s %s", address, bytes, ascii);
+}
+
+int main(void)
+{
+    uint32_t base = 0x88000000;
+
+    while(1) {
+        dclear(C_WHITE);
+        dtext(8, 8, C_BLACK, "Memory peek");
+        dtext(8, 28, C_BLACK, "UP/DOWN: move  EXIT: leave");
+
+        for(int i = 0; i < 18; i++) {
+            draw_line(70 + 20 * i, base + 8 * i);
+        }
+
+        dupdate();
+
+        int key = getkey().key;
+        if(key == KEY_EXIT) {
+            return 1;
+        }
+        if(key == KEY_UP) {
+            base -= 8 * 18;
+        }
+        if(key == KEY_DOWN) {
+            base += 8 * 18;
+        }
+    }
+}
+```
+
+## Notes
+
+This is a debugging technique. Prefer normal pointers, buffers and file APIs when writing apps.
+
+The exception handler is temporary: It is installed only around the risky memory read, then removed immediately after.
+
