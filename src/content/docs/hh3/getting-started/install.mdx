@@ -1,0 +1,67 @@
+---
+title: Install HollyHock3 MOD
+description: Install the HollyHock3 mod on your ClassPad.
+
+sidebar:
+  order: 2
+---
+
+HollyHock3 is installed as a mod for your ClassPad. The current installer is made for Windows only.
+
+If you use macOS, use Parallels or another Windows virtual machine. If you use Linux, we also recommend using a Windows virtual machine. Wine should work too, but if you run into issues, please [join our Discord server](https://discord.gg/knpcNJTzpd) and tell us what happened.
+
+## Disclaimer
+
+:::caution
+- I am not responsible for any damage you may do to your fx-CP400.
+- I am not liable if you brick or otherwise damage your calculator.
+- Casio will not fix your calculator if it shows evidence of tampering, like flashing with modified firmware images or using debug menus.
+- I will not fix your calculator.
+- If you cannot fix your calculator yourself, do not use this toolkit.
+- By using these tools, you agree to take full responsibility for any damage that may occur.
+- You have been warned.
+:::
+
+## Install the mod
+
+Go to [classpad.dev](https://classpad.dev), then run the installer command from PowerShell:
+
+1. On Windows, press `Win + X` and choose `Windows PowerShell`.
+2. Copy and paste this command, then press Enter:
+
+```powershell
+irm https://get.classpad.dev/ | iex
+```
+
+3. Follow the installer steps.
+
+Not on Windows or having issues? [Join our Discord server](https://discord.gg/knpcNJTzpd) for help.
+
+## Copy files to your calculator
+
+When the installer is done, plug your calculator back in as USB storage.
+
+Copy `run.bin` to the root of your calculator storage. Also copy any `.hh3` games and Python apps you want to run to the root of the calculator.
+
+## Launch HollyHock
+
+1. Go to the ClassPad home screen.
+2. Open `System`.
+3. Open the top left `System` menu.
+4. Choose `Hollyhock Launcher`.
+
+![Open System on the ClassPad](https://classpad.dev/img/step1_system.png)
+
+![Open Hollyhock Launcher from the System menu](https://classpad.dev/img/step2_launcher.png)
+
+## Run your app
+
+In the launcher, pick the app you want to run from the list and click `Run`.
+
+The launcher is a bit slow, so be sure to press for a good second.
+
+![Pick your app in the Hollyhock Launcher](https://classpad.dev/img/step3_yal.png)
+
+Your app should now run.
+
+![CPBoy running on the ClassPad](https://classpad.dev/img/step4_run.png)
