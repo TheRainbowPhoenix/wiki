@@ -1,0 +1,115 @@
+---
+title: USB with Python
+description: Send bytes between your ClassPad and a computer with gint.USB.
+sidebar:
+  order: 2
+---
+
+`gint.USB` gives your ClassPad a way to talk to a computer through the vendor-specific ff-bulk interface. Your computer needs a matching USB client, most only offers linux builds (at the time of this writing).
+
+Note that usb is only available in latest V3 builds. Older builds may not export `USB`, so check `hasattr(gint, "USB")` before using it.
+
+## Quick example
+
+```python
+import gint
+
+with gint.USB() as usb:
+    usb.write(b"Hello from the ClassPad!\n")
+    usb.flush()
+```
+
+Once you are inside the `with` block, the USB interface stays open for the duration of the block and is closed automatically when you leave it. This automatic close also happens when Python raises an exception inside the block, and you do not need to clean up manually in that case.
+
+On the computer side, you will also need a compatible ff-bulk reader running before you try to communicate with the calculator, otherwise the program would hang.
+
+:::warning
+All `gint.USB` methods accept positional arguments only. Write `usb.read(64, 250)` instead of `usb.read(size=64, timeout=250)`.
+:::
+
+
+## Methods
+
+#### `USB() -> gint.USB`
+Creates the wrapper without opening a connection. Call `open()` or use `with` to actually connect. The interface belongs to the device rather than to each Python object: You should keep a single owner and close it when you're done, because there is no automatic close on garbage collection.
+
+#### `USB.open() -> None`
+Opens ff-bulk and waits for the host to configure the connection. There is no timeout argument.
+
+#### `USB.close() -> None`
+Closes the USB interface.
+
+#### `USB.write(data) -> None`
+Sends a readable buffer. `bytes`, `bytearray`, and `memoryview` all work. The transfer is synchronous, but the message does not leave the device until you call `flush()`. This method returns `None` instead of a byte count.
+
+#### `USB.flush() -> None`
+Commits the pending output transfer. Call it once your message is ready to go out.
+
+#### `USB.read(size=-1, timeout=None) -> bytes`
+Returns up to `size` bytes. A negative `size` selects 256 bytes, which is not the same as unlimited input.
+
+The timeout is measured in milliseconds. Passing `None` or a negative value waits without a deadline, while a non-negative value uses the timed read path. A timeout returns `b""`, and other negative driver results raise `OSError`. Reads may come back shorter than requested, so an empty result is not a universal end-of-file marker on this API.
+
+The result is allocated by the method. There is no `readinto()` variant, so large reads cost RAM.
+
+#### `USB.fxlink_header(application, type, size) -> None`
+Writes an fxlink header announcing the next `size` payload bytes. This only writes the header. It does not send your payload, add a newline, or flush anything. Invalid parameters raise `ValueError`, and the accepted labels come from gint's fxlink helper.
+
+## Reading a full message
+
+USB reads don't promise to match your packet boundaries, so keep reading until you have collected the byte count your protocol expects:
+
+```python
+def read_exact(usb, size):
+    result = bytearray(size)
+    offset = 0
+    while offset < size:
+        part = usb.read(size - offset, 250)
+        if not part:
+            raise OSError("USB read timed out")
+        result[offset:offset + len(part)] = part
+        offset += len(part)
+    return result
+```
+
+The 250 ms timeout applies to each individual read rather than to the whole operation. This example stops on a timeout, but your protocol might prefer to retry instead.
+
+## Sending an fxlink message
+
+```python
+import gint
+
+payload = b"Hello!\n"
+with gint.USB() as usb:
+    usb.fxlink_header("myapp", "text", len(payload))
+    usb.write(payload)
+    usb.flush()
+```
+
+A handy rule of thumb is to write the header, then write the payload, and finally flush once. You will need a matching fxlink client on the computer. The [C USB reference](/wiki/gint/reference/kernel/usb/) and [ff-bulk notes](/wiki/gint/reference/kernel/usb-ff-bulk/) describe that layer in more detail.
+
+## The remote server example
+
+The bundled `server.py` example layers its own packet protocol on top of `gint.USB`. Its request header consists of two big-endian unsigned 32-bit words: the packet type and the payload length. That framing belongs to the script rather than to `gint.USB` itself.
+
+| Command | Type |
+| --- | --- |
+| PING | `0x1001` |
+| STOP | `0x1002` |
+| EXEC | `0x1003` |
+| STATUS | `0x1004` |
+| WRITE 8/16/32 | `0x2001`, `0x2002`, `0x2003` |
+| READ 8/16/32 | `0x2011`, `0x2012`, `0x2013` |
+| MASK 8/16/32 | `0x2021`, `0x2022`, `0x2023` |
+
+A successful PING returns protocol version 5 followed by the echoed bytes. EXEC output arrives as stream records with type `0x80000001`, followed by a final success or error record, and it is not a single plain-text reply. The supplied server gives each EXEC request fresh globals and redirects its own `print()` calls, but this will not capture output from every native module.
+
+READ and WRITE go through [memx](/wiki/python/reference/memx/). MASK uses `machine.mem8`, `mem16`, or `mem32` with `new = (old & and_mask) ^ xor_mask`. These operations touch real hardware addresses, so you should be careful. The script checks alignment, but memx itself does not. Only use this server with your own trusted local client.
+
+## Desktop builds
+
+The experimental native hosts can expose a virtual USB endpoint, but they cannot find or control a real calculator. Windows uses a shared-memory bridge, while the Unix host uses a loopback TCP listener. Their timing, buffering, and error handling are conveniences rather than hardware guarantees. See [headless tools](/wiki/python/headless/) for more.
+
+## Source
+
+The reference implementation is the native wrapper [`ports/sh/objgintusb.c`](https://github.com/TheRainbowPhoenix/PythonExtra/blob/main/ports/sh/objgintusb.c). Older builds may not export `USB`, so check `hasattr(gint, "USB")` before using it.

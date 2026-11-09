@@ -1,0 +1,52 @@
+---
+title: memx
+description: Copy blocks to and from raw memory.
+sidebar:
+  order: 4
+---
+
+`memx` copies a buffer to or from a raw memory address. The copy runs in C, which means you do not need a Python loop over every byte or register word. It is a low-level fxcp tool built for direct memory access. Its usage is **DISCOURAGED** unless you do know what you're doing. If you just want to read certain register values, prefer `machine` usage. 
+
+:::danger
+`memx` performs no bounds checking, alignment checking, or address validation. A bad address or a misaligned word access will crash the calculator. Memory-mapped hardware registers can also have side effects when you read or write them. Only use addresses you got from hardware documentation or buffers you own, because there is no sandbox around the copy.
+:::
+
+```python
+import memx
+```
+
+## read and write
+
+`read(buffer, address, width)` copies from `address` into a writable buffer and returns `None`. `write(address, buffer, width)` copies a readable buffer to `address` and returns `None`.
+
+The destination comes first in both functions, which is worth remembering because the signatures look symmetrical at a glance. All three arguments are required and positional, and there is no separate length argument because the buffer length serves as the byte count.
+
+| width | Access size |
+| --- | --- |
+| `1` | Byte, 8 bits |
+| `2` | Halfword, 16 bits |
+| `4` | Word, 32 bits |
+
+For reads you need a writable buffer, so a `bytearray`, writable `memoryview`, or `array` will do. Writes also accept `bytes` and read-only buffers. A `memoryview` is handy when you want to transfer part of an existing buffer without copying it first:
+
+```python
+def read_block(address, byte_count):
+    result = bytearray(byte_count)
+    memx.read(result, address, 1)
+    return result
+
+def write_block(address, data):
+    memx.write(address, data, 1)
+```
+
+For word-sized hardware accesses, choose width 2 or 4 and make sure both the address and the buffer are aligned to that width. Keep the byte length a multiple of the width as well. The wrapper does not check any of this, and it performs `len(buffer) // width` accesses while silently dropping an incomplete final word. Width zero is not valid, and you should not count on an exception to catch a bad width, alignment, or address.
+
+The address side of each access is volatile, and the byte order stays native, which is big-endian on the SuperH ClassPad. There is no conversion to or from USB packet order. Copying 4 bytes with width 4 is a single 32-bit access, while copying the same bytes with width 1 is four byte accesses, and for device registers that difference matters a lot.
+
+## memx and machine.mem8
+
+Use `machine.mem8[address]`, `machine.mem16`, or `machine.mem32` for a single scalar access or a read-modify-write operation, and reach for memx when you need to move blocks. There are no `memx.mem8`, `memx.mask()`, or `memx.alloc()` functions. The register mask commands in the USB server are Python code built on `machine` and you can read more about that in [USB with Python](/wiki/python/reference/gint-usb/).
+
+## Source
+
+The implementation lives in [`ports/sh/modmemx.c`](https://github.com/TheRainbowPhoenix/PythonExtra/blob/main/ports/sh/modmemx.c)

@@ -180,7 +180,7 @@ export const sidebar = [
                     collapsed: true,
                     autogenerate: { directory: 'python/reference' },
                 },
-                { label: 'Optimize', link: '/python/optimize/' },
+                { label: 'Optimize & Tools', link: '/python/optimize/' }
             ]
         }),
         group('Misc', {

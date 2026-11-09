@@ -33,6 +33,7 @@ from gint import *
 - [Image and Font Objects](#image-and-font-objects)
   - [Image Object](#image-object)
   - [Font Object](#font-object)
+- [USB](#usb)
 - [Differences with gint's C API](#differences-with-gints-c-api)
 
 ## Initialization
@@ -327,3 +328,11 @@ The Python wrapper for `gint` is designed to be close to the C API, but some dif
 - **dwindow_set()**: Does not return the old window settings. Use `dwindow_get()` first if you need to restore them.
 - **Timeouts**: Asynchronous volatile flags for timeouts (like in `getkey_opt`) are replaced with synchronous millisecond integer delays.
 - **dgray()**: Returns a boolean instead of an integer error code.
+
+
+## USB
+
+The fxcp wrapper provides **`gint.USB`** module.
+See [USB with Python](/wiki/python/reference/gint-usb/) for `open`, `close`,
+`read`, `write`, `flush`, `fxlink_header`, context managers and packet examples.
+For raw block transfers used by the USB server, see [memx](/wiki/python/reference/memx/).
